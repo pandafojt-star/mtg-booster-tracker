@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="Windows-1250">
-<title> MTG Booster Tracker</title>
-
+<meta charset="windows-1250">
+<title>ULTIMATE MTG Tracker</title>
+<link rel="stylesheet" href="https://unpkg.com/keyrune/css/keyrune.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -23,13 +23,25 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 .draft{background:#2196f3;}
 .set{background:#ff9800;}
 .collector{background:#9c27b0;}
-.icon{width:24px;height:24px;vertical-align:middle;margin-right:5px;}
+.icon{font-size:24px; vertical-align:middle; margin-right:5px;}
 .lang{float:right;}
+@media(max-width:700px){
+  table, thead, tbody, th, td, tr{display:block;}
+  th{display:none;}
+  td{border:none;position:relative;padding-left:50%;}
+  td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
+  td:nth-of-type(1):before{content:"Edice";}
+  td:nth-of-type(2):before{content:"Počet";}
+  td:nth-of-type(3):before{content:"Boxy";}
+  td:nth-of-type(4):before{content:"Typ";}
+  td:nth-of-type(5):before{content:"Akce";}
+}
 </style>
 </head>
 <body>
 
 <h2 id="title">ULTIMATE MTG Booster Tracker</h2>
+
 <div class="lang">
 <button onclick="setLang('cz')">🇨🇿</button>
 <button onclick="setLang('en')">🇬🇧</button>
@@ -72,31 +84,32 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 <canvas id="chart"></canvas>
 
 <script>
-const editionIcons = {
-  "murders of karlov manor": "https://keyrune.andrewgioia.com/icons.html?icon=MKM",
-  "lost caverns of ixalan": <i class="ss ss-lci"></i>,
-  "march of the machine": "https://keyrune.andrewgioia.com/icons.html?icon=MOM",
-  "new capenna": "https://keyrune.andrewgioia.com/icons.html?icon=NCC",
-  "innistrad crimson vow": "https://keyrune.andrewgioia.com/icons.html?icon=VOW",
-  "innistrad midnight hunt": "https://keyrune.andrewgioia.com/icons.html?icon=MID",
-  "zendikar rising": "https://keyrune.andrewgioia.com/icons.html?icon=ZNR",
-  "ikoria lair of behemoths": "https://keyrune.andrewgioia.com/icons.html?icon=IKO",
-  "ravnica allegiance": "https://keyrune.andrewgioia.com/icons.html?icon=RNA",
-  "double masters": "https://keyrune.andrewgioia.com/icons.html?icon=2MA",
-  "edge of eternities": "https://keyrune.andrewgioia.com/icons.html?icon=EE",
-  "final fantasy": "https://keyrune.andrewgioia.com/icons.html?icon=FF",
-  "aetherdrift": "https://keyrune.andrewgioia.com/icons.html?icon=AE",
-  "assassins creed": "https://keyrune.andrewgioia.com/icons.html?icon=ACR",
-  "duskmourn house of horrors": "https://keyrune.andrewgioia.com/icons.html?icon=DU",
-  "modern horizons iii": "https://keyrune.andrewgioia.com/icons.html?icon=MH3",
-  "foundations": "https://keyrune.andrewgioia.com/icons.html?icon=FDN",
-  "lord of the rings tales of middle-earth": "https://keyrune.andrewgioia.com/icons.html?icon=LOTR",
-  "phyrexia all will be one": "https://keyrune.andrewgioia.com/icons.html?icon=ONE",
-  "avatar": "https://keyrune.andrewgioia.com/icons.html?icon=AVT",
-  "lorwyn eclipsed": "https://keyrune.andrewgioia.com/icons.html?icon=LE",
-  "spiderman": "https://keyrune.andrewgioia.com/icons.html?icon=SM",
-  "teenage mutant ninja turtles": "https://keyrune.andrewgioia.com/icons.html?icon=TMNT"
+const editionKeyrune = {
+  "murders of karlov manor":"mkm",
+  "lost caverns of ixalan":"lci",
+  "march of the machine":"mom",
+  "new capenna":"ncc",
+  "innistrad crimson vow":"vow",
+  "innistrad midnight hunt":"mid",
+  "zendikar rising":"znr",
+  "ikoria lair of behemoths":"iko",
+  "ravnica allegiance":"rna",
+  "double masters":"2ma",
+  "edge of eternities":"ee",
+  "final fantasy":"ff",
+  "aetherdrift":"ae",
+  "assassins creed":"acr",
+  "duskmourn house of horrors":"du",
+  "modern horizons iii":"mh3",
+  "foundations":"fdn",
+  "lord of the rings tales of middle-earth":"lotr",
+  "phyrexia all will be one":"one",
+  "avatar":"avt",
+  "lorwyn eclipsed":"le",
+  "spiderman":"sm",
+  "teenage mutant ninja turtles":"tmnt"
 }
+
 let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
 function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }
@@ -106,7 +119,8 @@ function render(){
     let tbody=document.querySelector("#table tbody")
     tbody.innerHTML=""
     sets.forEach((s,i)=>{
-        let iconHTML = s.iconURL?`<img class="icon" src="${s.iconURL}" alt="icon">`:""
+        let key = s.keyrune
+        let iconHTML = key? `<i class="ss ss-${key} icon"></i>` : ""
         tbody.innerHTML+=`
 <tr>
 <td>${iconHTML}${s.name}</td>
@@ -124,14 +138,13 @@ function render(){
 function addSet(){
     let name=document.getElementById("setName").value.trim()
     if(!name) return
-    let nameKey = name.toLowerCase()
-    let iconURL = editionIcons[nameKey] || "" // automaticky doplní ikonu
+    let key = editionKeyrune[name.toLowerCase()] || ""
     let count=parseInt(document.getElementById("count").value)
     let boxCount=parseInt(document.getElementById("boxCount").value)
     let types=[]
-    document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value);c.checked=false})
+    document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value); c.checked=false})
     if(types.length==0) return
-    sets.push({name,iconURL,count,boxCount,types})
+    sets.push({name,keyrune:key,count,boxCount,types})
     document.getElementById("setName").value=""
     document.getElementById("count").value=1
     document.getElementById("boxCount").value=0
@@ -140,6 +153,7 @@ function addSet(){
 }
 
 function removeSet(i){ sets.splice(i,1); save(); render() }
+
 function searchTable(){
     let f=document.getElementById("search").value.toLowerCase()
     document.querySelectorAll("#table tbody tr").forEach(r=>{
@@ -166,8 +180,8 @@ function updateChart(){
 }
 
 function exportCSV(){
-    let csv="Edice,Pocet,Boxy,Typy,Ikona\n"
-    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}",${s.iconURL}\n`})
+    let csv="Edice,Pocet,Boxy,Typy\n"
+    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}"\n`})
     let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a")
     a.href=url;a.download="mtg_boostery.csv";a.click()
 }
@@ -214,5 +228,6 @@ function setLang(lang){
 
 render()
 </script>
+
 </body>
 </html>

@@ -2,17 +2,15 @@
 <html lang="cs">
 <head>
   <script type="module">
-    function updateChart(){
-    // Ověř, že chart je již definován a znič ho, pokud ano
-    if (window.chart) {
+  function updateChart(){
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
+    sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
+    let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
+
+    // Pokud graf existuje, zničíme ho před vytvořením nového
+    if (window.chart instanceof Chart) {
         window.chart.destroy();
     }
-
-    // Sčítání počtu boosterů
-    let stats = {PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0};
-    sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
-
-    let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
 
     // Vytvoření nového grafu
     window.chart = new Chart(document.getElementById("chart"), {

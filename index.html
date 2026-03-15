@@ -52,10 +52,18 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 <input id="count" type="number" min="1" value="1" style="width:70px">
 <input id="boxCount" type="number" min="0" value="0" style="width:70px" title="Počet boxů">
 
-<label><input type="checkbox" value="PLAY">PLAY</label>
-<label><input type="checkbox" value="SET">SET</label>
-<label><input type="checkbox" value="DRAFT">DRAFT</label>
-<label><input type="checkbox" value="COLLECTOR">COLLECTOR</label>
+<!-- Typy boosterů / checkboxy -->
+<div id="booster-types">
+  <label><input type="checkbox" value="PLAY"> PLAY</label>
+  <label><input type="checkbox" value="SET"> SET</label>
+  <label><input type="checkbox" value="DRAFT"> DRAFT</label>
+  <label><input type="checkbox" value="COLLECTOR"> COLLECTOR</label>
+  <label><input type="checkbox" value="PROMO"> PROMO</label>
+  <label><input type="checkbox" value="JUMPSTART"> JUMPSTART</label>
+  <label><input type="checkbox" value="BEYOND"> BEYOND</label>
+  <label><input type="checkbox" value="PRERELEASE PROMO"> PRERELEASE PROMO</label>
+  <label><input type="checkbox" value="THEME"> THEME</label>
+</div>
 
 <button onclick="addSet()" id="addBtn">Přidat</button>
 <button class="exportBtn" onclick="exportCSV()">Export CSV</button>
@@ -85,31 +93,282 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 
 <script>
 const editionKeyrune = {
-  "murders of karlov manor":"mkm",
-  "lost caverns of ixalan":"lci",
-  "march of the machine":"mom",
-  "new capenna":"ncc",
-  "innistrad crimson vow":"vow",
-  "innistrad midnight hunt":"mid",
-  "zendikar rising":"znr",
-  "ikoria lair of behemoths":"iko",
-  "ravnica allegiance":"rna",
-  "double masters":"2ma",
-  "edge of eternities":"ee",
-  "final fantasy":"ff",
-  "aetherdrift":"ae",
-  "assassins creed":"acr",
-  "duskmourn house of horrors":"du",
-  "modern horizons iii":"mh3",
+
+  // Core Sets
+  "alpha":"lea",
+  "beta":"leb",
+  "unlimited":"2ed",
+  "revised":"3ed",
+  "alpha online":"1e",
+  "beta online":"2e",
+  "unlimited online":"2u",
+  "revised online":"3e",
+  "fourth edition":"4ed",
+  "summer magic":"psum",
+  "fifth edition":"5ed",
+  "sixth edition":"6ed",
+  "seventh edition":"7ed",
+  "eighth edition":"8ed",
+  "ninth edition":"9ed",
+  "tenth edition":"10e",
+  "magic 2010":"m10",
+  "magic 2011":"m11",
+  "magic 2012":"m12",
+  "magic 2013":"m13",
+  "magic 2014":"m14",
+  "magic 2015":"m15",
+  "blank core set":"bcore",
+  "magic origins":"ori",
+  "magic 2019":"m19",
+  "magic 2020":"m20",
+  "core 2021":"m21",
+  "adventures in the forgotten realms":"afr",
   "foundations":"fdn",
-  "lord of the rings tales of middle-earth":"lotr",
+
+  // Expansion
+  "arabian nights":"arn",
+  "antiquities":"atq",
+  "legends":"leg",
+  "the dark":"drk",
+  "fallen empires":"fem",
+  "homelands":"hml",
+  "ice age":"ice",
+  "ice age original":"ice2",
+  "alliances":"all",
+  "coldsnap":"csp",
+  "mirage":"mir",
+  "visions":"vis",
+  "weatherlight":"wth",
+  "tempest":"tmp",
+  "stronghold":"sth",
+  "exodus":"exo",
+  "urza's saga":"usg",
+  "urza's legacy":"ulg",
+  "urza's destiny":"uds",
+  "mercadian masques":"mmq",
+  "nemesis":"nem",
+  "prophecy":"pcy",
+  "invasion":"inv",
+  "planeshift":"pls",
+  "apocalypse":"apc",
+  "odyssey":"ody",
+  "torment":"tor",
+  "judgement":"jud",
+  "onslaught":"ons",
+  "legions":"lgn",
+  "scourge":"scg",
+  "mirrodin":"mrd",
+  "darksteel":"dst",
+  "fifth dawn":"5dn",
+  "champions of kamigawa":"chk",
+  "betrayers of kamigawa":"bok",
+  "saviors of kamigawa":"sok",
+  "ravnica":"rav",
+  "guildpact":"gpt",
+  "dissension":"dis",
+  "time spiral":"tsp",
+  "planar chaos":"plc",
+  "future sight":"fut",
+  "lorwyn":"lrw",
+  "morningtide":"mor",
+  "shadowmoor":"shm",
+  "eventide":"eve",
+  "shards of alara":"ala",
+  "conflux":"con",
+  "alara reborn":"arb",
+  "zendikar":"zen",
+  "worldwake":"wwk",
+  "rise of the eldrazi":"roe",
+  "scars of mirrodin":"som",
+  "mirrodin besieged":"mbs",
+  "new phyrexia":"nph",
+  "innistrad":"isd",
+  "dark ascension":"dka",
+  "avacyn restored":"avr",
+  "return to ravnica":"rtr",
+  "gatecrash":"gtc",
+  "dragon's maze":"dgm",
+  "theros":"ths",
+  "born of the gods":"bng",
+  "journey into nyx":"jou",
+  "khans of tarkir":"ktk",
+  "fate reforged":"frf",
+  "dragons of tarkir":"dtk",
+  "battle for zendikar":"bfz",
+  "oath of the gatewatch":"ogw",
+  "shadows over innistrad":"soi",
+  "eldritch moon":"emn",
+  "kaladesh":"kld",
+  "aether revolt":"aer",
+  "amonkhet":"akh",
+  "hour of devastation":"hou",
+  "ixalan":"xln",
+  "rivals of ixalan":"rix",
+  "dominaria":"dom",
+  "guilds of ravnica":"grn",
+  "ravnica allegiance":"rna",
+  "war of the spark":"war",
+  "throne of eldraine":"eld",
+  "theros beyond death":"thb",
+  "ikoria lair of behemoths":"iko",
+  "zendikar rising":"znr",
+  "kaldheim":"khm",
+  "strixhaven school of mages":"stx",
+  "innistrad midnight hunt":"mid",
+  "innistrad crimson vow":"vow",
+  "kamigawa neon dynasty":"neo",
+  "streets of new capenna":"snc",
+  "dominaria united":"dmu",
+  "the brothers' war":"bro",
   "phyrexia all will be one":"one",
-  "avatar":"avt",
-  "lorwyn eclipsed":"le",
-  "spiderman":"sm",
-  "teenage mutant ninja turtles":"tmnt"
+  "march of the machine":"mom",
+  "march of the machine aftermath":"mat",
+  "wilds of eldraine":"woe",
+  "lost caverns of ixalan":"lci",
+  "murders at karlov manor":"mkm",
+  "outlaws of thunder junction":"otj",
+  "the big score":"big",
+  "bloomburrow":"blb",
+  "duskmourn house of horrors":"dsk",
+  "aetherdrift":"dft",
+  "tarkir dragonstorm":"tdm",
+  "final fantasy":"fin",
+  "edge of eternities":"eoe",
+  "marvel spider-man":"spm",
+  "avatar the last airbender":"tla",
+  "lorwyn eclipsed":"ecl",
+  "teenage mutant ninja turtles":"tmt",
+
+  // *** Command Zone Sets ***
+  "vanguard":"van",
+  "planechase":"hop",
+  "archenemy":"arc",
+  "commander":"cmd",
+  "planechase 2012":"pc2",
+  "commander's arsenal":"cm1",
+  "commander 2013":"c13",
+  "conspiracy":"cns",
+  "commander 2014":"c14",
+  "commander 2015":"c15",
+  "conspiracy 2 take the crown":"cn2",
+  "commander 2016":"c16",
+  "planechase anthology":"pca",
+  "commander anthology":"cma",
+  "archenemy nicol bolas":"e01",
+  "explorers of ixalan":"e02",
+  "commander 2017":"c17",
+  "commander anthology 2":"cm2",
+  "battlebond":"bbd",
+  "commander 2018":"c18",
+  "commander 2019":"c19",
+  "ikoria commander 2020":"c20",
+  "zendikar rising commander":"znc",
+  "commander collection green":"cc1",
+  "commander legends":"cmr",
+  "commander legends decks":"cmc",
+  "kaldheim commander":"khc",
+  "commander 2021":"c21",
+  "forgotten realms commander":"afc",
+  "midnight hunt commander":"mic",
+  "crimson vow commander":"voc",
+  "commander collection black":"cc2",
+  "kamigawa commander":"nec",
+  "streets of new capenna commander":"ncc",
+  "commander legends battle for baldurs gate":"clb",
+  "dominaria united commander":"dmc",
+  "warhammer 40k":"40k",
+  "the brothers war commander":"brc",
+  "phyrexia all will be one commander":"onc",
+  "march of the machine commander":"moc",
+  "starter commander decks":"scd",
+  "commander masters":"cmm",
+  "lord of the rings commander":"ltc",
+  "ub doctor who":"who",
+  "wilds of eldraine commander":"woc",
+  "lci commander":"lcc",
+  "ub fallout":"pip",
+  "mkm commander":"mkc",
+  "otj commander":"otc",
+  "bloomburrow commander":"blc",
+
+  // *** Reprint Sets ***
+  "chronicles":"chr",
+  "anthologies":"ath",
+  "battle royale":"brb",
+  "beatdown":"btd",
+  "deckmasters":"dkm",
+  "modern masters":"mma",
+  "modern masters 2015":"mm2",
+  "eternal masters":"ema",
+  "modern masters 2017":"mm3",
+  "renaissance":"ren",
+  "rinascimento":"rin",
+  "iconic masters":"ima",
+  "masters 25":"a25",
+  "ultimate masters":"uma",
+  "modern horizons":"mh1",
+  "modern horizons 2":"mh2",
+  "double masters":"2xm",
+  "jumpstart":"jmp",
+  "mystery booster":"mb1",
+  "modern horizons":"mh1",
+  "mystery booster 2":"mb2",
+  "jumpstart 2025":"j25",
+  "pioneer masters":"pio",
+  "ff through the ages":"fca",
+
+  // *** Beginner / Duel / Promo / Digital Sets ***
+  "portal":"por",
+  "portal 2":"p02",
+  "portal three kingdoms":"ptk",
+  "starter 1999":"s99",
+  "starter 2000":"s00",
+  "welcome deck 2016":"w16",
+  "welcome deck 2017":"w17",
+
+  "elves v goblins":"evg",
+  "jace v chandra":"dd2",
+  // …atd. (můžeš rozšířit s dalšími dle potřeby)
+};
+
+  // seznam všech typů boosterů
+const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASE PROMO","THEME"];
+
+// uložení do localStorage
+function saveTable() {
+  const tableData = [];
+  document.querySelectorAll("#mtg-table tbody tr").forEach(row => {
+    const rowData = {
+      name: row.querySelector(".card-name").innerText,
+      edition: row.querySelector(".card-edition").innerText,
+      boosters: []
+    };
+    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      if(cb.checked) rowData.boosters.push(cb.value);
+    });
+    tableData.push(rowData);
+  });
+  localStorage.setItem("mtgTableData", JSON.stringify(tableData));
 }
 
+// načtení z localStorage
+function loadTable() {
+  const tableData = JSON.parse(localStorage.getItem("mtgTableData") || "[]");
+  tableData.forEach(rowData => addRow(rowData));
+}
+
+// počítání boosterů
+function countBoosters() {
+  const counts = {};
+  boosterTypes.forEach(type => counts[type] = 0);
+  document.querySelectorAll("#mtg-table tbody tr").forEach(row => {
+    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      if(cb.checked) counts[cb.value]++;
+    });
+  });
+  console.log("Počty boosterů:", counts);
+}
+  
 let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
 function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }

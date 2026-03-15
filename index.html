@@ -2,108 +2,114 @@
 <html lang="cs">
 <head>
 <meta charset="windows-1250">
-<title>MTG Booster Tracker</title>
+<title>ULTIMATE MTG Booster Tracker</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
 body{
-font-family:Arial;
-background:linear-gradient(135deg,#1e1e2f,#2b2b40);
-color:white;
-padding:30px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#1e1e2f,#2b2b40);
+    color: white;
+    padding: 20px;
+    margin:0;
 }
 
 h2{
-text-align:center;
+    text-align: center;
 }
 
 .panel{
-background:#2f2f4f;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
+    background:#2f2f4f;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
 }
 
-input{
-padding:7px;
-border-radius:6px;
-border:none;
-margin-right:8px;
+input, select{
+    padding:7px;
+    border-radius:6px;
+    border:none;
+    margin-right:8px;
 }
 
 button{
-padding:7px 14px;
-border:none;
-border-radius:6px;
-background:#4caf50;
-color:white;
-font-weight:bold;
-cursor:pointer;
+    padding:7px 14px;
+    border:none;
+    border-radius:6px;
+    background:#4caf50;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    margin-right:5px;
 }
 
 button:hover{
-background:#43a047;
+    background:#43a047;
 }
 
 .exportBtn{
-background:#ff9800;
+    background:#ff9800;
 }
 
 .deleteBtn{
-background:#e53935;
-color:white;
-border:none;
-border-radius:6px;
-padding:5px 10px;
-cursor:pointer;
+    background:#e53935;
 }
 
 table{
-width:100%;
-border-collapse:collapse;
-background:white;
-color:#222;
-border-radius:10px;
-overflow:hidden;
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    color:#222;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 th{
-background:#3b3b6d;
-color:white;
-padding:10px;
+    background:#3b3b6d;
+    color:white;
+    padding:10px;
 }
 
 td{
-padding:10px;
-border-bottom:1px solid #ddd;
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    vertical-align: middle;
 }
 
 .tag{
-padding:4px 10px;
-border-radius:8px;
-font-size:12px;
-font-weight:bold;
-margin-right:4px;
-display:inline-block;
+    padding:4px 10px;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:bold;
+    margin-right:4px;
+    display:inline-block;
+    color:white;
 }
 
-.play{background:#4caf50}
-.draft{background:#2196f3}
-.set{background:#ff9800}
-.collector{background:#9c27b0}
+.play{background:#4caf50;}
+.draft{background:#2196f3;}
+.set{background:#ff9800;}
+.collector{background:#9c27b0;}
 
-.lang{
-float:right;
+.lang{float:right;}
+
+@media(max-width:700px){
+    table, thead, tbody, th, td, tr {display:block;}
+    th{display:none;}
+    td{border:none;position:relative;padding-left:50%;}
+    td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
+    td:nth-of-type(1):before{content:"Edice";}
+    td:nth-of-type(2):before{content:"Počet";}
+    td:nth-of-type(3):before{content:"Typ";}
+    td:nth-of-type(4):before{content:"Akce";}
 }
-
 </style>
 </head>
 
 <body>
 
-<h2 id="title">MTG Booster Tracker</h2>
+<h2 id="title">ULTIMATE MTG Booster Tracker</h2>
 
 <div class="lang">
 <button onclick="setLang('cz')">🇨🇿</button>
@@ -111,10 +117,9 @@ float:right;
 </div>
 
 <div class="panel">
-
-<input id="setName" placeholder="Edice">
-
-<input id="count" type="number" value="1" min="1" style="width:70px">
+<input id="setName" placeholder="Název edice">
+<input id="count" type="number" min="1" value="1" style="width:70px">
+<input id="boxCount" type="number" min="0" value="0" style="width:70px" title="Počet boxů">
 
 <label><input type="checkbox" value="PLAY">PLAY</label>
 <label><input type="checkbox" value="SET">SET</label>
@@ -123,214 +128,151 @@ float:right;
 
 <button onclick="addSet()" id="addBtn">Přidat</button>
 <button class="exportBtn" onclick="exportCSV()">Export CSV</button>
+<button onclick="importJSON()">Import JSON</button>
+<button onclick="exportJSON()">Export JSON</button>
 
 <br><br>
 
 <input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
 
-<div id="stats"></div>
-
+<div id="stats" style="margin-top:10px;font-weight:bold;"></div>
 </div>
 
 <table id="table">
-
 <thead>
 <tr>
 <th id="colSet">Edice</th>
 <th id="colCount">Počet</th>
+<th id="colBox">Boxy</th>
 <th id="colType">Typ</th>
 <th id="colAction">Akce</th>
 </tr>
 </thead>
-
 <tbody></tbody>
-
 </table>
 
 <br><br>
-
 <canvas id="chart"></canvas>
 
 <script>
+let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
-let sets=JSON.parse(localStorage.getItem("mtgSets"))||[]
-
-function save(){
-localStorage.setItem("mtgSets",JSON.stringify(sets))
-}
+function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }
 
 function createTags(types){
-
-let html=""
-
-types.forEach(t=>{
-html+=`<span class="tag ${t.toLowerCase()}">${t}</span>`
-})
-
-return html
+    return types.map(t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`).join("")
 }
 
 function render(){
-
-let tbody=document.querySelector("#table tbody")
-tbody.innerHTML=""
-
-sets.forEach((s,i)=>{
-
-tbody.innerHTML+=`
+    let tbody=document.querySelector("#table tbody")
+    tbody.innerHTML=""
+    sets.forEach((s,i)=>{
+        tbody.innerHTML+=`
 <tr>
 <td>${s.name}</td>
 <td>${s.count}</td>
+<td>${s.boxCount}</td>
 <td>${createTags(s.types)}</td>
-<td><button class="deleteBtn" onclick="removeSet(${i})">X</button></td>
+<td>
+<button class="deleteBtn" onclick="removeSet(${i})">X</button>
+</td>
 </tr>
 `
-
-})
-
-updateStats()
-updateChart()
-
+    })
+    updateStats()
+    updateChart()
 }
 
 function addSet(){
-
-let name=document.getElementById("setName").value.trim()
-let count=parseInt(document.getElementById("count").value)
-
-let types=[]
-
-document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{
-types.push(c.value)
-c.checked=false
-})
-
-if(!name||types.length==0)return
-
-sets.push({name,count,types})
-
-document.getElementById("setName").value=""
-document.getElementById("count").value=1
-
-save()
-render()
-
+    let name=document.getElementById("setName").value.trim()
+    let count=parseInt(document.getElementById("count").value)
+    let boxCount=parseInt(document.getElementById("boxCount").value)
+    let types=[]
+    document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value);c.checked=false})
+    if(!name||types.length==0)return
+    sets.push({name,count,boxCount,types})
+    document.getElementById("setName").value=""
+    document.getElementById("count").value=1
+    document.getElementById("boxCount").value=0
+    save()
+    render()
 }
 
-function removeSet(i){
-
-sets.splice(i,1)
-
-save()
-render()
-
-}
+function removeSet(i){ sets.splice(i,1); save(); render() }
 
 function searchTable(){
-
-let f=document.getElementById("search").value.toLowerCase()
-
-document.querySelectorAll("#table tbody tr").forEach(r=>{
-
-let t=r.children[0].innerText.toLowerCase()
-
-r.style.display=t.includes(f)?"":"none"
-
-})
-
+    let f=document.getElementById("search").value.toLowerCase()
+    document.querySelectorAll("#table tbody tr").forEach(r=>{
+        r.style.display=r.children[0].innerText.toLowerCase().includes(f)?"":"none"
+    })
 }
 
 function updateStats(){
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
+    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
+    document.getElementById("stats").innerText=
+        `PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR}`
+}
 
-let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
-
-sets.forEach(s=>{
-s.types.forEach(t=>{
-stats[t]+=s.count
-})
-})
-
-document.getElementById("stats").innerHTML=
-`PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR}`
-
+function updateChart(){
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
+    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
+    let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR]
+    if(window.chart) chart.destroy()
+    window.chart=new Chart(document.getElementById("chart"),{
+        type:"pie",
+        data:{labels:["PLAY","SET","DRAFT","COLLECTOR"],datasets:[{data:data,backgroundColor:["#4caf50","#ff9800","#2196f3","#9c27b0"]}]}
+    })
 }
 
 function exportCSV(){
-
-let csv="Edice,Pocet,Typy\n"
-
-sets.forEach(s=>{
-csv+=`${s.name},${s.count},"${s.types.join(" ")}"\n`
-})
-
-let blob=new Blob([csv],{type:"text/csv"})
-let url=URL.createObjectURL(blob)
-
-let a=document.createElement("a")
-a.href=url
-a.download="mtg_boostery.csv"
-a.click()
-
+    let csv="Edice,Pocet,Boxy,Typy\n"
+    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}"\n`})
+    let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a")
+    a.href=url;a.download="mtg_boostery.csv";a.click()
 }
 
-let chart
-
-function updateChart(){
-
-let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
-
-sets.forEach(s=>{
-s.types.forEach(t=>{
-stats[t]+=s.count
-})
-})
-
-let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR]
-
-if(chart) chart.destroy()
-
-chart=new Chart(document.getElementById("chart"),{
-type:"pie",
-data:{
-labels:["PLAY","SET","DRAFT","COLLECTOR"],
-datasets:[{
-data:data
-}]
+function exportJSON(){
+    let blob=new Blob([JSON.stringify(sets,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a")
+    a.href=url;a.download="mtg_boostery.json";a.click()
 }
-})
 
+function importJSON(){
+    let input=document.createElement("input")
+    input.type="file"; input.accept=".json"
+    input.onchange=e=>{
+        let file=e.target.files[0]; if(!file) return
+        let reader=new FileReader()
+        reader.onload=ev=>{ sets=JSON.parse(ev.target.result); save(); render() }
+        reader.readAsText(file)
+    }
+    input.click()
 }
 
 function setLang(lang){
-
-if(lang=="cz"){
-
-title.innerText="Správce MTG boosterů"
-addBtn.innerText="Přidat"
-search.placeholder="Vyhledat edici..."
-colSet.innerText="Edice"
-colCount.innerText="Počet"
-colType.innerText="Typ"
-colAction.innerText="Akce"
-
-}
-
-if(lang=="en"){
-
-title.innerText="MTG Booster Tracker"
-addBtn.innerText="Add"
-search.placeholder="Search set..."
-colSet.innerText="Set"
-colCount.innerText="Count"
-colType.innerText="Type"
-colAction.innerText="Action"
-
-}
-
+    if(lang=="cz"){
+        title.innerText="ULTIMATE MTG Správce boosterů"
+        addBtn.innerText="Přidat"
+        search.placeholder="Vyhledat edici..."
+        colSet.innerText="Edice"
+        colCount.innerText="Počet"
+        colBox.innerText="Boxy"
+        colType.innerText="Typ"
+        colAction.innerText="Akce"
+    }
+    if(lang=="en"){
+        title.innerText="ULTIMATE MTG Booster Tracker"
+        addBtn.innerText="Add"
+        search.placeholder="Search set..."
+        colSet.innerText="Set"
+        colCount.innerText="Count"
+        colBox.innerText="Boxes"
+        colType.innerText="Type"
+        colAction.innerText="Action"
+    }
 }
 
 render()
-
 </script>
 
 </body>

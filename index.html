@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+  <script type="module">
+    async function loadCloud(){
+ const snap = await getDoc(doc(db,"mtg","sets"))
+ if(snap.exists()){
+   sets = snap.data().data
+ }
+ render()
+}
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBgEMvZVsGzTUt-m949NQs79oF0jnKqmTQ",
+    authDomain: "mtg-booster-tracker.firebaseapp.com",
+    projectId: "mtg-booster-tracker",
+    storageBucket: "mtg-booster-tracker.firebasestorage.app",
+    messagingSenderId: "993152973317",
+    appId: "1:993152973317:web:23711bb4105d83b0993a6c",
+    measurementId: "G-D1WLKP1PCB"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 <meta charset="windows-1250">
 <title>ULTIMATE MTG Tracker</title>
 <link rel="stylesheet" href="https://unpkg.com/keyrune/css/keyrune.css">
@@ -359,9 +389,9 @@ function saveTable() {
 }
 
 // načtení z localStorage
-function loadTable() {
-  const tableData = JSON.parse(localStorage.getItem("mtgTableData") || "[]");
-  tableData.forEach(rowData => addRow(rowData));
+async function save(){
+ localStorage.setItem("mtgSets",JSON.stringify(sets))
+ await setDoc(doc(db,"mtg","sets"),{data:sets})
 }
 
 // počítání boosterů
@@ -492,7 +522,7 @@ function setLang(lang){
     }
 }
 
-render()
+loadCloud()
 </script>
 
 </body>

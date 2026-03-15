@@ -1,116 +1,35 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="windows-1250">
+<meta charset="Windows-1250">
 <title>ULTIMATE MTG Booster Tracker</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#1e1e2f,#2b2b40);
-    color: white;
-    padding: 20px;
-    margin:0;
-}
-
-h2{
-    text-align: center;
-}
-
-.panel{
-    background:#2f2f4f;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:20px;
-}
-
-input, select{
-    padding:7px;
-    border-radius:6px;
-    border:none;
-    margin-right:8px;
-}
-
-button{
-    padding:7px 14px;
-    border:none;
-    border-radius:6px;
-    background:#4caf50;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    margin-right:5px;
-}
-
-button:hover{
-    background:#43a047;
-}
-
-.exportBtn{
-    background:#ff9800;
-}
-
-.deleteBtn{
-    background:#e53935;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:white;
-    color:#222;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-th{
-    background:#3b3b6d;
-    color:white;
-    padding:10px;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
-    vertical-align: middle;
-}
-
-.tag{
-    padding:4px 10px;
-    border-radius:8px;
-    font-size:12px;
-    font-weight:bold;
-    margin-right:4px;
-    display:inline-block;
-    color:white;
-}
-
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#1e1e2f,#2b2b40);color:white;padding:20px;margin:0;}
+h2{text-align:center;}
+.panel{background:#2f2f4f;padding:15px;border-radius:10px;margin-bottom:20px;}
+input, select{padding:7px;border-radius:6px;border:none;margin-right:8px;}
+button{padding:7px 14px;border:none;border-radius:6px;background:#4caf50;color:white;font-weight:bold;cursor:pointer;margin-right:5px;}
+button:hover{background:#43a047;}
+.exportBtn{background:#ff9800;}
+.deleteBtn{background:#e53935;}
+table{width:100%;border-collapse:collapse;background:white;color:#222;border-radius:10px;overflow:hidden;}
+th{background:#3b3b6d;color:white;padding:10px;}
+td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
+.tag{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:bold;margin-right:4px;display:inline-block;color:white;}
 .play{background:#4caf50;}
 .draft{background:#2196f3;}
 .set{background:#ff9800;}
 .collector{background:#9c27b0;}
-
+.icon{width:24px;height:24px;vertical-align:middle;margin-right:5px;}
 .lang{float:right;}
-
-@media(max-width:700px){
-    table, thead, tbody, th, td, tr {display:block;}
-    th{display:none;}
-    td{border:none;position:relative;padding-left:50%;}
-    td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
-    td:nth-of-type(1):before{content:"Edice";}
-    td:nth-of-type(2):before{content:"Počet";}
-    td:nth-of-type(3):before{content:"Typ";}
-    td:nth-of-type(4):before{content:"Akce";}
-}
 </style>
 </head>
-
 <body>
 
 <h2 id="title">ULTIMATE MTG Booster Tracker</h2>
-
 <div class="lang">
 <button onclick="setLang('cz')">🇨🇿</button>
 <button onclick="setLang('en')">🇬🇧</button>
@@ -132,9 +51,7 @@ td{
 <button onclick="exportJSON()">Export JSON</button>
 
 <br><br>
-
 <input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
-
 <div id="stats" style="margin-top:10px;font-weight:bold;"></div>
 </div>
 
@@ -155,27 +72,49 @@ td{
 <canvas id="chart"></canvas>
 
 <script>
+const editionIcons = {
+    "murders of karlov manor":"https://example.com/icons/karlov.png",
+    "lost caverns of ixalan":"https://example.com/icons/ixalan.png",
+    "march of the machine":"https://example.com/icons/motm.png",
+    "new capenna":"https://example.com/icons/newcapenna.png",
+    "innistrad crimson vow":"https://example.com/icons/crimsonvow.png",
+    "innistrad midnight hunt":"https://example.com/icons/midnighthunt.png",
+    "zendikar rising":"https://example.com/icons/zendikar.png",
+    "ikoria lair of behemoths":"https://example.com/icons/ikoria.png",
+    "ravnica allegiance":"https://example.com/icons/ravnica.png",
+    "double masters":"https://example.com/icons/doublemasters.png",
+    "edge of eternities":"https://example.com/icons/edge.png",
+    "final fantasy":"https://example.com/icons/finalfantasy.png",
+    "aetherdrift":"https://example.com/icons/aetherdrift.png",
+    "assassins creed":"https://example.com/icons/assassins.png",
+    "duskmourn house of horrors":"https://example.com/icons/duskmourn.png",
+    "modern horizons iii":"https://example.com/icons/modernhorizons3.png",
+    "foundations":"https://example.com/icons/foundations.png",
+    "lord of the rings tales of middle-earth":"https://example.com/icons/lotr.png",
+    "phyrexia all will be one":"https://example.com/icons/phyrexia.png",
+    "avatar":"https://example.com/icons/avatar.png",
+    "lorwyn eclipsed":"https://example.com/icons/lorwyn.png",
+    "spiderman":"https://example.com/icons/spiderman.png",
+    "teenage mutant ninja turtles":"https://example.com/icons/tmnt.png"
+}
+
 let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
 function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }
-
-function createTags(types){
-    return types.map(t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`).join("")
-}
+function createTags(types){ return types.map(t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`).join("") }
 
 function render(){
     let tbody=document.querySelector("#table tbody")
     tbody.innerHTML=""
     sets.forEach((s,i)=>{
+        let iconHTML = s.iconURL?`<img class="icon" src="${s.iconURL}" alt="icon">`:""
         tbody.innerHTML+=`
 <tr>
-<td>${s.name}</td>
+<td>${iconHTML}${s.name}</td>
 <td>${s.count}</td>
 <td>${s.boxCount}</td>
 <td>${createTags(s.types)}</td>
-<td>
-<button class="deleteBtn" onclick="removeSet(${i})">X</button>
-</td>
+<td><button class="deleteBtn" onclick="removeSet(${i})">X</button></td>
 </tr>
 `
     })
@@ -185,12 +124,15 @@ function render(){
 
 function addSet(){
     let name=document.getElementById("setName").value.trim()
+    if(!name) return
+    let nameKey = name.toLowerCase()
+    let iconURL = editionIcons[nameKey] || "" // automaticky doplní ikonu
     let count=parseInt(document.getElementById("count").value)
     let boxCount=parseInt(document.getElementById("boxCount").value)
     let types=[]
     document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value);c.checked=false})
-    if(!name||types.length==0)return
-    sets.push({name,count,boxCount,types})
+    if(types.length==0) return
+    sets.push({name,iconURL,count,boxCount,types})
     document.getElementById("setName").value=""
     document.getElementById("count").value=1
     document.getElementById("boxCount").value=0
@@ -199,7 +141,6 @@ function addSet(){
 }
 
 function removeSet(i){ sets.splice(i,1); save(); render() }
-
 function searchTable(){
     let f=document.getElementById("search").value.toLowerCase()
     document.querySelectorAll("#table tbody tr").forEach(r=>{
@@ -226,8 +167,8 @@ function updateChart(){
 }
 
 function exportCSV(){
-    let csv="Edice,Pocet,Boxy,Typy\n"
-    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}"\n`})
+    let csv="Edice,Pocet,Boxy,Typy,Ikona\n"
+    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}",${s.iconURL}\n`})
     let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a")
     a.href=url;a.download="mtg_boostery.csv";a.click()
 }
@@ -274,6 +215,5 @@ function setLang(lang){
 
 render()
 </script>
-
 </body>
 </html>

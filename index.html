@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="utf-8">
+<meta charset="windows-1250">
 <title>ULTIMATE MTG Tracker</title>
 <link rel="stylesheet" href="https://unpkg.com/keyrune/css/keyrune.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,7 +26,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 .promo{background:#14DF87;}
 .jumpstart{background:#DF14B7;}
 .beyond{background:#66A23E;}
-['prerelease promo']{background:#E5CCFF;}
+.prerelease promo{background:#E5CCFF;}
 .theme{background:#970EA1;}
 .icon{font-size:24px; vertical-align:middle; margin-right:5px;}
 .lang{float:right;}
@@ -35,7 +35,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
   th{display:none;}
   td{border:none;position:relative;padding-left:50%;}
   td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
-  td:nth-of-type(1):before{content:"Edice";} 
+  td:nth-of-type(1):before{content:"Edice";}
   td:nth-of-type(2):before{content:"Počet";}
   td:nth-of-type(3):before{content:"Boxy";}
   td:nth-of-type(4):before{content:"Typ";}
@@ -57,6 +57,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 <input id="count" type="number" min="1" value="1" style="width:70px">
 <input id="boxCount" type="number" min="0" value="0" style="width:70px" title="Počet boxů">
 
+<!-- Typy boosterů / checkboxy -->
 <div id="booster-types">
   <label><input type="checkbox" value="PLAY"> PLAY</label>
   <label><input type="checkbox" value="SET"> SET</label>
@@ -295,6 +296,7 @@ const editionKeyrune = {
   "otj commander":"otc",
   "bloomburrow commander":"blc",
 
+  // *** Reprint Sets ***
  // Reprint Sets
   "chronicles":"chr",
   "anthologies":"ath",
@@ -311,9 +313,11 @@ const editionKeyrune = {
   "masters 25":"a25",
   "ultimate masters":"uma",
   "modern horizons":"mh1",
+  "modern horizons 2":"mh2",
   "double masters":"2xm",
   "jumpstart":"jmp",
   "mystery booster":"mb1",
+  "innistrad remastered":"inr",
   "modern horizons 2":"mh2",
   "strixhaven mystical archives":"sta",
   "jumpstart historic horizons":"j21",
@@ -343,7 +347,8 @@ const editionKeyrune = {
 
   "elves v goblins":"evg",
   "jace v chandra":"dd2",
-
+  // …atd. (můžeš rozšířit s dalšími dle potřeby)
+const editionKeyrune = {
   // … předchozí Core, Expansion, Command Zone, Reprint, Beginner, Duel Sets …
 
   // Other Supplemental Products
@@ -405,7 +410,7 @@ function countBoosters() {
   });
   console.log("Počty boosterů:", counts);
 }
-  
+
 let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
 function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }

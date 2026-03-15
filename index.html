@@ -5,6 +5,11 @@
     if (typeof Chart === 'undefined') {
     console.error("Chart.js není správně načtený!");
 } else {
+    console.log("Chart.js načtený správně");
+}
+    if (typeof Chart === 'undefined') {
+    console.error("Chart.js není správně načtený!");
+} else {
     // Pokračuj s vykreslováním grafu
     window.chart = new Chart(document.getElementById("chart"), {
         type: "pie",
@@ -17,17 +22,21 @@
         }
     });
 }
-function updateChart(){
+unction updateChart(){
     let stats = { PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0 };
     sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
     let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
 
     // Pokud existuje předchozí graf, zničíme ho
-    if (window.chart instanceof Chart) {  // kontrola jestli je to skutečně instance třídy Chart
+    if (window.chart && window.chart instanceof Chart) {  // Ověření, že window.chart je správně inicializovaný
+        console.log("Zničuji předchozí graf");
         window.chart.destroy();  // Zničení předchozího grafu
+    } else {
+        console.log("Žádný graf k destrukci.");
     }
 
     // Vytvoření nového grafu
+    console.log("Vytvářím nový graf");
     window.chart = new Chart(document.getElementById("chart"), {
         type: "pie",
         data: {

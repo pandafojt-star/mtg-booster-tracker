@@ -2,14 +2,14 @@
 <html lang="cs">
 <head>
   <script type="module">
-  function updateChart(){
-    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
+ function updateChart(){
+    let stats = { PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0 };
     sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
     let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
 
-    // Pokud graf existuje, zničíme ho před vytvořením nového
-    if (window.chart instanceof Chart) {
-        window.chart.destroy();
+    // Pokud existuje předchozí graf, zničíme ho
+    if (window.chart && window.chart.destroy) {
+        window.chart.destroy();  // Zničení předchozího grafu
     }
 
     // Vytvoření nového grafu

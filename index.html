@@ -2,6 +2,30 @@
 <html lang="cs">
 <head>
   <script type="module">
+    function updateChart(){
+    // Ověř, že chart je již definován a znič ho, pokud ano
+    if (window.chart) {
+        window.chart.destroy();
+    }
+
+    // Sčítání počtu boosterů
+    let stats = {PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0};
+    sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
+
+    let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
+
+    // Vytvoření nového grafu
+    window.chart = new Chart(document.getElementById("chart"), {
+        type: "pie",
+        data: {
+            labels: ["PLAY", "SET", "DRAFT", "COLLECTOR"],
+            datasets: [{
+                data: data,
+                backgroundColor: ["#4caf50", "#ff9800", "#2196f3", "#9c27b0"]
+            }]
+        }
+    });
+}
     async function loadCloud(){
  const snap = await getDoc(doc(db,"mtg","sets"))
  if(snap.exists()){

@@ -344,7 +344,7 @@ const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYO
 // uložení do localStorage
 function saveTable() {
   const tableData = [];
-  document.querySelectorAll("#mtg-table tbody tr").forEach(row => {
+  document.querySelectorAll("#table tbody tr").forEach(row => {
     const rowData = {
       name: row.querySelector(".card-name").innerText,
       edition: row.querySelector(".card-edition").innerText,
@@ -368,7 +368,7 @@ function loadTable() {
 function countBoosters() {
   const counts = {};
   boosterTypes.forEach(type => counts[type] = 0);
-  document.querySelectorAll("#mtg-table tbody tr").forEach(row => {
+  document.querySelectorAll("#table tbody tr").forEach(row => {
     row.querySelectorAll("input[type=checkbox]").forEach(cb => {
       if(cb.checked) counts[cb.value]++;
     });

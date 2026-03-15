@@ -2,7 +2,9 @@
 <html lang="cs">
 <head>
 <meta charset="windows-1250">
-<title>MTG Booster Manager</title>
+<title>MTG Booster Tracker</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
@@ -47,7 +49,15 @@ background:#43a047;
 
 .exportBtn{
 background:#ff9800;
-margin-left:10px;
+}
+
+.deleteBtn{
+background:#e53935;
+color:white;
+border:none;
+border-radius:6px;
+padding:5px 10px;
+cursor:pointer;
 }
 
 table{
@@ -70,20 +80,6 @@ padding:10px;
 border-bottom:1px solid #ddd;
 }
 
-.deleteBtn{
-background:#e53935;
-color:white;
-border:none;
-border-radius:6px;
-padding:5px 10px;
-cursor:pointer;
-}
-
-.stats{
-margin-top:10px;
-font-weight:bold;
-}
-
 .tag{
 padding:4px 10px;
 border-radius:8px;
@@ -93,38 +89,46 @@ margin-right:4px;
 display:inline-block;
 }
 
-.play{background:#4caf50;color:white;}
-.draft{background:#2196f3;color:white;}
-.set{background:#ff9800;color:white;}
-.collector{background:#9c27b0;color:white;}
+.play{background:#4caf50}
+.draft{background:#2196f3}
+.set{background:#ff9800}
+.collector{background:#9c27b0}
+
+.lang{
+float:right;
+}
 
 </style>
 </head>
 
 <body>
 
-<h2>MTG Booster Manager</h2>
+<h2 id="title">MTG Booster Tracker</h2>
+
+<div class="lang">
+<button onclick="setLang('cz')">🇨🇿</button>
+<button onclick="setLang('en')">🇬🇧</button>
+</div>
 
 <div class="panel">
 
 <input id="setName" placeholder="Edice">
 
-<input id="count" type="number" min="1" value="1" style="width:70px">
+<input id="count" type="number" value="1" min="1" style="width:70px">
 
 <label><input type="checkbox" value="PLAY">PLAY</label>
 <label><input type="checkbox" value="SET">SET</label>
 <label><input type="checkbox" value="DRAFT">DRAFT</label>
 <label><input type="checkbox" value="COLLECTOR">COLLECTOR</label>
 
-<button onclick="addSet()">P�idat</button>
-
+<button onclick="addSet()" id="addBtn">Přidat</button>
 <button class="exportBtn" onclick="exportCSV()">Export CSV</button>
 
 <br><br>
 
 <input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
 
-<div class="stats" id="stats"></div>
+<div id="stats"></div>
 
 </div>
 
@@ -132,16 +136,20 @@ display:inline-block;
 
 <thead>
 <tr>
-<th>Edice</th>
-<th>Po�et</th>
-<th>Typ</th>
-<th>Akce</th>
+<th id="colSet">Edice</th>
+<th id="colCount">Počet</th>
+<th id="colType">Typ</th>
+<th id="colAction">Akce</th>
 </tr>
 </thead>
 
 <tbody></tbody>
 
 </table>
+
+<br><br>
+
+<canvas id="chart"></canvas>
 
 <script>
 
@@ -156,12 +164,10 @@ function createTags(types){
 let html=""
 
 types.forEach(t=>{
-let c=t.toLowerCase()
-html+=`<span class="tag ${c}">${t}</span>`
+html+=`<span class="tag ${t.toLowerCase()}">${t}</span>`
 })
 
 return html
-
 }
 
 function render(){
@@ -176,13 +182,14 @@ tbody.innerHTML+=`
 <td>${s.name}</td>
 <td>${s.count}</td>
 <td>${createTags(s.types)}</td>
-<td><button class="deleteBtn" onclick="removeSet(${i})">Smazat</button></td>
+<td><button class="deleteBtn" onclick="removeSet(${i})">X</button></td>
 </tr>
 `
 
 })
 
 updateStats()
+updateChart()
 
 }
 
@@ -235,12 +242,7 @@ r.style.display=t.includes(f)?"":"none"
 
 function updateStats(){
 
-let stats={
-PLAY:0,
-SET:0,
-DRAFT:0,
-COLLECTOR:0
-}
+let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
 
 sets.forEach(s=>{
 s.types.forEach(t=>{
@@ -268,6 +270,62 @@ let a=document.createElement("a")
 a.href=url
 a.download="mtg_boostery.csv"
 a.click()
+
+}
+
+let chart
+
+function updateChart(){
+
+let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0}
+
+sets.forEach(s=>{
+s.types.forEach(t=>{
+stats[t]+=s.count
+})
+})
+
+let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR]
+
+if(chart) chart.destroy()
+
+chart=new Chart(document.getElementById("chart"),{
+type:"pie",
+data:{
+labels:["PLAY","SET","DRAFT","COLLECTOR"],
+datasets:[{
+data:data
+}]
+}
+})
+
+}
+
+function setLang(lang){
+
+if(lang=="cz"){
+
+title.innerText="Správce MTG boosterů"
+addBtn.innerText="Přidat"
+search.placeholder="Vyhledat edici..."
+colSet.innerText="Edice"
+colCount.innerText="Počet"
+colType.innerText="Typ"
+colAction.innerText="Akce"
+
+}
+
+if(lang=="en"){
+
+title.innerText="MTG Booster Tracker"
+addBtn.innerText="Add"
+search.placeholder="Search set..."
+colSet.innerText="Set"
+colCount.innerText="Count"
+colType.innerText="Type"
+colAction.innerText="Action"
+
+}
 
 }
 

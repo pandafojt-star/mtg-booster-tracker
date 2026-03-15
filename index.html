@@ -2,13 +2,28 @@
 <html lang="cs">
 <head>
   <script type="module">
- function updateChart(){
+    if (typeof Chart === 'undefined') {
+    console.error("Chart.js není správně načtený!");
+} else {
+    // Pokračuj s vykreslováním grafu
+    window.chart = new Chart(document.getElementById("chart"), {
+        type: "pie",
+        data: {
+            labels: ["PLAY", "SET", "DRAFT", "COLLECTOR"],
+            datasets: [{
+                data: data,
+                backgroundColor: ["#4caf50", "#ff9800", "#2196f3", "#9c27b0"]
+            }]
+        }
+    });
+}
+function updateChart(){
     let stats = { PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0 };
     sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
     let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
 
     // Pokud existuje předchozí graf, zničíme ho
-    if (window.chart && window.chart.destroy) {
+    if (window.chart instanceof Chart) {  // kontrola jestli je to skutečně instance třídy Chart
         window.chart.destroy();  // Zničení předchozího grafu
     }
 

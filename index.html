@@ -73,31 +73,30 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 
 <script>
 const editionIcons = {
-    "murders of karlov manor":"https://example.com/icons/karlov.png",
-    "lost caverns of ixalan":"https://example.com/icons/ixalan.png",
-    "march of the machine":"https://example.com/icons/motm.png",
-    "new capenna":"https://example.com/icons/newcapenna.png",
-    "innistrad crimson vow":"https://example.com/icons/crimsonvow.png",
-    "innistrad midnight hunt":"https://example.com/icons/midnighthunt.png",
-    "zendikar rising":"https://example.com/icons/zendikar.png",
-    "ikoria lair of behemoths":"https://example.com/icons/ikoria.png",
-    "ravnica allegiance":"https://example.com/icons/ravnica.png",
-    "double masters":"https://example.com/icons/doublemasters.png",
-    "edge of eternities":"https://example.com/icons/edge.png",
-    "final fantasy":"https://example.com/icons/finalfantasy.png",
-    "aetherdrift":"https://example.com/icons/aetherdrift.png",
-    "assassins creed":"https://example.com/icons/assassins.png",
-    "duskmourn house of horrors":"https://example.com/icons/duskmourn.png",
-    "modern horizons iii":"https://example.com/icons/modernhorizons3.png",
-    "foundations":"https://example.com/icons/foundations.png",
-    "lord of the rings tales of middle-earth":"https://example.com/icons/lotr.png",
-    "phyrexia all will be one":"https://example.com/icons/phyrexia.png",
-    "avatar":"https://example.com/icons/avatar.png",
-    "lorwyn eclipsed":"https://example.com/icons/lorwyn.png",
-    "spiderman":"https://example.com/icons/spiderman.png",
-    "teenage mutant ninja turtles":"https://example.com/icons/tmnt.png"
+  "murders of karlov manor": "https://keyrune.andrewgioia.com/icons.html?icon=MKM",
+  "lost caverns of ixalan": "https://keyrune.andrewgioia.com/icons.html?icon=LCI",
+  "march of the machine": "https://keyrune.andrewgioia.com/icons.html?icon=MOM",
+  "new capenna": "https://keyrune.andrewgioia.com/icons.html?icon=NCC",
+  "innistrad crimson vow": "https://keyrune.andrewgioia.com/icons.html?icon=VOW",
+  "innistrad midnight hunt": "https://keyrune.andrewgioia.com/icons.html?icon=MID",
+  "zendikar rising": "https://keyrune.andrewgioia.com/icons.html?icon=ZNR",
+  "ikoria lair of behemoths": "https://keyrune.andrewgioia.com/icons.html?icon=IKO",
+  "ravnica allegiance": "https://keyrune.andrewgioia.com/icons.html?icon=RNA",
+  "double masters": "https://keyrune.andrewgioia.com/icons.html?icon=2MA",
+  "edge of eternities": "https://keyrune.andrewgioia.com/icons.html?icon=EE",
+  "final fantasy": "https://keyrune.andrewgioia.com/icons.html?icon=FF",
+  "aetherdrift": "https://keyrune.andrewgioia.com/icons.html?icon=AE",
+  "assassins creed": "https://keyrune.andrewgioia.com/icons.html?icon=ACR",
+  "duskmourn house of horrors": "https://keyrune.andrewgioia.com/icons.html?icon=DU",
+  "modern horizons iii": "https://keyrune.andrewgioia.com/icons.html?icon=MH3",
+  "foundations": "https://keyrune.andrewgioia.com/icons.html?icon=FDN",
+  "lord of the rings tales of middle-earth": "https://keyrune.andrewgioia.com/icons.html?icon=LOTR",
+  "phyrexia all will be one": "https://keyrune.andrewgioia.com/icons.html?icon=ONE",
+  "avatar": "https://keyrune.andrewgioia.com/icons.html?icon=AVT",
+  "lorwyn eclipsed": "https://keyrune.andrewgioia.com/icons.html?icon=LE",
+  "spiderman": "https://keyrune.andrewgioia.com/icons.html?icon=SM",
+  "teenage mutant ninja turtles": "https://keyrune.andrewgioia.com/icons.html?icon=TMNT"
 }
-
 let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
 function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }

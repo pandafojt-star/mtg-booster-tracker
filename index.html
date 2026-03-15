@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="windows-1250">
+<title>MTG Booster Manager</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#1e1e2f,#2b2b40);
+color:white;
+padding:30px;
+}
+
+h2{
+text-align:center;
+}
+
+.panel{
+background:#2f2f4f;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+input{
+padding:7px;
+border-radius:6px;
+border:none;
+margin-right:8px;
+}
+
+button{
+padding:7px 14px;
+border:none;
+border-radius:6px;
+background:#4caf50;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#43a047;
+}
+
+.exportBtn{
+background:#ff9800;
+margin-left:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+color:#222;
+border-radius:10px;
+overflow:hidden;
+}
+
+th{
+background:#3b3b6d;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+.deleteBtn{
+background:#e53935;
+color:white;
+border:none;
+border-radius:6px;
+padding:5px 10px;
+cursor:pointer;
+}
+
+.stats{
+margin-top:10px;
+font-weight:bold;
+}
+
+.tag{
+padding:4px 10px;
+border-radius:8px;
+font-size:12px;
+font-weight:bold;
+margin-right:4px;
+display:inline-block;
+}
+
+.play{background:#4caf50;color:white;}
+.draft{background:#2196f3;color:white;}
+.set{background:#ff9800;color:white;}
+.collector{background:#9c27b0;color:white;}
+
+</style>
+</head>
+
+<body>
+
+<h2>MTG Booster Manager</h2>
+
+<div class="panel">
+
+<input id="setName" placeholder="Edice">
+
+<input id="count" type="number" min="1" value="1" style="width:70px">
+
+<label><input type="checkbox" value="PLAY">PLAY</label>
+<label><input type="checkbox" value="SET">SET</label>
+<label><input type="checkbox" value="DRAFT">DRAFT</label>
+<label><input type="checkbox" value="COLLECTOR">COLLECTOR</label>
+
+<button onclick="addSet()">Přidat</button>
+
+<button class="exportBtn" onclick="exportCSV()">Export CSV</button>
+
+<br><br>
+
+<input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
+
+<div class="stats" id="stats"></div>
+
+</div>
+
+<table id="table">
+
+<thead>
+<tr>
+<th>Edice</th>
+<th>Počet</th>
+<th>Typ</th>
+<th>Akce</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<script>
+
+let sets=JSON.parse(localStorage.getItem("mtgSets"))||[]
+
+function save(){
+localStorage.setItem("mtgSets",JSON.stringify(sets))
+}
+
+function createTags(types){
+
+let html=""
+
+types.forEach(t=>{
+let c=t.toLowerCase()
+html+=`<span class="tag ${c}">${t}</span>`
+})
+
+return html
+
+}
+
+function render(){
+
+let tbody=document.querySelector("#table tbody")
+tbody.innerHTML=""
+
+sets.forEach((s,i)=>{
+
+tbody.innerHTML+=`
+<tr>
+<td>${s.name}</td>
+<td>${s.count}</td>
+<td>${createTags(s.types)}</td>
+<td><button class="deleteBtn" onclick="removeSet(${i})">Smazat</button></td>
+</tr>
+`
+
+})
+
+updateStats()
+
+}
+
+function addSet(){
+
+let name=document.getElementById("setName").value.trim()
+let count=parseInt(document.getElementById("count").value)
+
+let types=[]
+
+document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{
+types.push(c.value)
+c.checked=false
+})
+
+if(!name||types.length==0)return
+
+sets.push({name,count,types})
+
+document.getElementById("setName").value=""
+document.getElementById("count").value=1
+
+save()
+render()
+
+}
+
+function removeSet(i){
+
+sets.splice(i,1)
+
+save()
+render()
+
+}
+
+function searchTable(){
+
+let f=document.getElementById("search").value.toLowerCase()
+
+document.querySelectorAll("#table tbody tr").forEach(r=>{
+
+let t=r.children[0].innerText.toLowerCase()
+
+r.style.display=t.includes(f)?"":"none"
+
+})
+
+}
+
+function updateStats(){
+
+let stats={
+PLAY:0,
+SET:0,
+DRAFT:0,
+COLLECTOR:0
+}
+
+sets.forEach(s=>{
+s.types.forEach(t=>{
+stats[t]+=s.count
+})
+})
+
+document.getElementById("stats").innerHTML=
+`PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR}`
+
+}
+
+function exportCSV(){
+
+let csv="Edice,Pocet,Typy\n"
+
+sets.forEach(s=>{
+csv+=`${s.name},${s.count},"${s.types.join(" ")}"\n`
+})
+
+let blob=new Blob([csv],{type:"text/csv"})
+let url=URL.createObjectURL(blob)
+
+let a=document.createElement("a")
+a.href=url
+a.download="mtg_boostery.csv"
+a.click()
+
+}
+
+render()
+
+</script>
+
+</body>
+</html>

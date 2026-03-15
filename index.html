@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <script type="module">
-    if (typeof Chart === 'undefined') {
+if (typeof Chart === 'undefined') {
     console.error("Chart.js není správně načtený!");
 } else {
     console.log("Chart.js načtený správně");
@@ -22,13 +22,13 @@
         }
     });
 }
-unction updateChart(){
+function updateChart() {
     let stats = { PLAY: 0, SET: 0, DRAFT: 0, COLLECTOR: 0 };
     sets.forEach(s => s.types.forEach(t => { stats[t] += s.count }));
     let data = [stats.PLAY, stats.SET, stats.DRAFT, stats.COLLECTOR];
 
-    // Pokud existuje předchozí graf, zničíme ho
-    if (window.chart && window.chart instanceof Chart) {  // Ověření, že window.chart je správně inicializovaný
+    // Pokud existuje předchozí graf a je správně inicializován jako instance Chart
+    if (window.chart instanceof Chart) {
         console.log("Zničuji předchozí graf");
         window.chart.destroy();  // Zničení předchozího grafu
     } else {

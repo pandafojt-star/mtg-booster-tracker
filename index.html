@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+ 
   
 <meta charset="windows-1250">
 <title>ULTIMATE MTG Tracker</title>
@@ -27,7 +28,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
 .promo{background:#14DF87;}
 .jumpstart{background:#DF14B7;}
 .beyond{background:#66A23E;}
-.prereleasepromo{background:#E5CCFF;}
+.prerelease promo{background:#E5CCFF;}
 .theme{background:#970EA1;}
 .icon{font-size:24px; vertical-align:middle; margin-right:5px;}
 .lang{float:right;}
@@ -67,7 +68,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
   <label><input type="checkbox" value="PROMO"> PROMO</label>
   <label><input type="checkbox" value="JUMPSTART"> JUMPSTART</label>
   <label><input type="checkbox" value="BEYOND"> BEYOND</label>
-  <label><input type="checkbox" value="PRERELEASEPROMO"> PRERELEASE PROMO</label>
+  <label><input type="checkbox" value="PRERELEASE PROMO"> PRERELEASE PROMO</label>
   <label><input type="checkbox" value="THEME"> THEME</label>
 </div>
 
@@ -338,13 +339,13 @@ const editionKeyrune = {
   "universes beyond: assassin's creed":"acr",
   "modern horizons 3":"mh3",
   "the lord of the rings: tales of middle-earth":"ltr",
-  
- 
+
+
   // …atd. (můžeš rozšířit s dalšími dle potřeby)
 };
 
   // seznam všech typů boosterů
-const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"];
+const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASE PROMO","THEME"];
 
 // uložení do localStorage
 function saveTable() {

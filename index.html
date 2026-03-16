@@ -67,7 +67,7 @@ td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
   <label><input type="checkbox" value="PROMO"> PROMO</label>
   <label><input type="checkbox" value="JUMPSTART"> JUMPSTART</label>
   <label><input type="checkbox" value="BEYOND"> BEYOND</label>
-  <label><input type="checkbox" value="PRERELEASE PROMO"> PRERELEASEPROMO</label>
+  <label><input type="checkbox" value="PRERELEASE PROMO"> PRERELEASE PROMO</label>
   <label><input type="checkbox" value="THEME"> THEME</label>
 </div>
 
@@ -433,20 +433,20 @@ function searchTable(){
 }
 
 function updateStats(){
-    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASE PROMO:0,THEME:0}
     sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
     document.getElementById("stats").innerText=
-        `PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR} | PROMO: ${stats.PROMO} | JUMPSTART: ${stats.JUMPSTART} | BEYOND: ${stats.BEYOND} | PRERELEASEPROMO: ${stats.PRERELEASEPROMO} | THEME: ${stats.THEME}`
+        `PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR} | PROMO: ${stats.PROMO} | JUMPSTART: ${stats.JUMPSTART} | BEYOND: ${stats.BEYOND} | PRERELEASE PROMO: ${stats.PRERELEASE PROMO} | THEME: ${stats.THEME}`
 }
 
 function updateChart(){
-    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASE PROMO:0,THEME:0}
     sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
-    let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR,stats.PROMO,stats.JUMPSTART,stats.BEYOND,stats.PRERELEASEPROMO,stats.THEME]
+    let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR,stats.PROMO,stats.JUMPSTART,stats.BEYOND,stats.PRERELEASE PROMO,stats.THEME]
     if(window.chart) chart.destroy()
     window.chart=new Chart(document.getElementById("chart"),{
         type:"pie",
-        data:{labels:["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"],datasets:[{data:data,backgroundColor:["#4caf50","#ff9800","#2196f3","#9c27b0"]}]}
+        data:{labels:["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASE PROMO","THEME"],datasets:[{data:data,backgroundColor:["#4caf50","#ff9800","#2196f3","#9c27b0"]}]}
     })
 }
 

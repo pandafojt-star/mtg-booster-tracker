@@ -1,236 +1,599 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<title>MTG Tracker 2.0</title>
 
+
+<meta charset="windows-1250">
+<title>ULTIMATE MTG Tracker</title>
 <link rel="stylesheet" href="https://unpkg.com/keyrune/css/keyrune.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{
-  font-family:Arial;
-  background:linear-gradient(135deg,#1e1e2f,#2b2b40);
-  color:white;
-  padding:20px;
-}
-
-.panel{
-  background:#2f2f4f;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:20px;
-}
-
-button{
-  padding:7px 14px;
-  border:none;
-  border-radius:6px;
-  background:#4caf50;
-  color:white;
-  cursor:pointer;
-  transition:0.2s;
-}
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#1e1e2f,#2b2b40);color:white;padding:20px;margin:0;}
+h2{text-align:center;}
+.panel{background:#2f2f4f;padding:15px;border-radius:10px;margin-bottom:20px;}
+input, select{padding:7px;border-radius:6px;border:none;margin-right:8px;}
+button{padding:7px 14px;border:none;border-radius:6px;background:#4caf50;color:white;font-weight:bold;cursor:pointer;margin-right:5px;}
 button:hover{background:#43a047;}
-button:active{transform:scale(0.95);}
-
-.deleteBtn{background:#e53935;}
 .exportBtn{background:#ff9800;}
-
-.tag{
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:12px;
-  margin:2px;
-  display:inline-block;
-  background:#555;
-}
-
-#toast{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#333;
-  padding:10px;
-  border-radius:8px;
-  display:none;
+.deleteBtn{background:#e53935;}
+table{width:100%;border-collapse:collapse;background:white;color:#222;border-radius:10px;overflow:hidden;}
+th{background:#3b3b6d;color:white;padding:10px;}
+td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
+.tag{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:bold;margin-right:4px;display:inline-block;color:white;}
+.play{background:#4caf50;}
+.draft{background:#2196f3;}
+.set{background:#ff9800;}
+.collector{background:#9c27b0;}
+.promo{background:#14DF87;}
+.jumpstart{background:#DF14B7;}
+.beyond{background:#66A23E;}
+.prereleasepromo{background:#E5CCFF;}
+.theme{background:#970EA1;}
+.icon{font-size:24px; vertical-align:middle; margin-right:5px;}
+.lang{float:right;}
+@media(max-width:700px){
+  table, thead, tbody, th, td, tr{display:block;}
+  th{display:none;}
+  td{border:none;position:relative;padding-left:50%;}
+  td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
+  td:nth-of-type(1):before{content:"Edice";}
+  td:nth-of-type(2):before{content:"Počet";}
+  td:nth-of-type(3):before{content:"Boxy";}
+  td:nth-of-type(4):before{content:"Typ";}
+  td:nth-of-type(5):before{content:"Akce";}
 }
 </style>
 </head>
-
 <body>
 
-<h2>🎴 MTG Tracker 2.0</h2>
+<h2 id="title">ULTIMATE MTG Booster Tracker</h2>
 
-<div class="panel">
-<input id="setName" placeholder="Set">
-<input id="count" type="number" value="1">
-
-<label><input type="checkbox" value="PLAY">PLAY</label>
-<label><input type="checkbox" value="SET">SET</label>
-<label><input type="checkbox" value="DRAFT">DRAFT</label>
-
-<br><br>
-
-<button onclick="addSet()">Add</button>
-<button onclick="openBooster()">🎮 Open Booster</button>
-<button onclick="mysteryEvent()">🎁 Mystery</button>
-
-<div id="stats"></div>
-<div id="luck"></div>
-<div id="game"></div>
-<div id="achievements"></div>
+<div class="lang">
+<button onclick="setLang('cz')">🇨🇿</button>
+<button onclick="setLang('en')">🇬🇧</button>
 </div>
 
-<table width="100%" style="background:white;color:black;">
+<div class="panel">
+<input id="setName" placeholder="Název edice">
+<input id="count" type="number" min="1" value="1" style="width:70px">
+<input id="boxCount" type="number" min="0" value="0" style="width:70px" title="Počet boxů">
+ <button onclick="openBooster()">🎮 Open Booster</button>
+<button onclick="mysteryEvent()">🎁 Mystery</button>
+
+<div id="gameLog" style="margin-top:10px;font-size:14px;"></div>
+<div id="achievements" style="margin-top:10px;"></div>
+<div id="luckMeter" style="margin-top:10px;font-weight:bold;"></div>
+
+<!-- Typy boosterů / checkboxy -->
+<div id="booster-types">
+  <label><input type="checkbox" value="PLAY"> PLAY</label>
+  <label><input type="checkbox" value="SET"> SET</label>
+  <label><input type="checkbox" value="DRAFT"> DRAFT</label>
+  <label><input type="checkbox" value="COLLECTOR"> COLLECTOR</label>
+  <label><input type="checkbox" value="PROMO"> PROMO</label>
+  <label><input type="checkbox" value="JUMPSTART"> JUMPSTART</label>
+  <label><input type="checkbox" value="BEYOND"> BEYOND</label>
+  <label><input type="checkbox" value="PRERELEASEPROMO"> PRERELEASEPROMO</label>
+  <label><input type="checkbox" value="THEME"> THEME</label>
+</div>
+
+<button onclick="addSet()" id="addBtn">Přidat</button>
+<button class="exportBtn" onclick="exportCSV()">Export CSV</button>
+<button onclick="importJSON()">Import JSON</button>
+<button onclick="exportJSON()">Export JSON</button>
+
+<br><br>
+<input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
+<div id="stats" style="margin-top:10px;font-weight:bold;"></div>
+</div>
+
+<table id="table">
 <thead>
-<tr><th>Set</th><th>Count</th><th>Type</th><th></th></tr>
+<tr>
+<th id="colSet">Edice</th>
+<th id="colCount">Počet</th>
+<th id="colBox">Boxy</th>
+<th id="colType">Typ</th>
+<th id="colAction">Akce</th>
+</tr>
 </thead>
-<tbody id="tbody"></tbody>
+<tbody></tbody>
 </table>
 
+<br><br>
 <canvas id="chart"></canvas>
 
-<div id="toast"></div>
-
 <script>
+const editionKeyrune = {
 
-// DATA
-let sets = JSON.parse(localStorage.getItem("sets")) || []
-let game = JSON.parse(localStorage.getItem("game")) || {
-  boosters:0,mythics:0,rares:0
+  // Core Sets
+  "alpha":"lea",
+  "beta":"leb",
+  "unlimited":"2ed",
+  "revised":"3ed",
+  "alpha online":"1e",
+  "beta online":"2e",
+  "unlimited online":"2u",
+  "revised online":"3e",
+  "fourth edition":"4ed",
+  "summer magic":"psum",
+  "fifth edition":"5ed",
+  "sixth edition":"6ed",
+  "seventh edition":"7ed",
+  "eighth edition":"8ed",
+  "ninth edition":"9ed",
+  "tenth edition":"10e",
+  "magic 2010":"m10",
+  "magic 2011":"m11",
+  "magic 2012":"m12",
+  "magic 2013":"m13",
+  "magic 2014":"m14",
+  "magic 2015":"m15",
+  "blank core set":"bcore",
+  "magic origins":"ori",
+  "magic 2019":"m19",
+  "magic 2020":"m20",
+  "core 2021":"m21",
+  "adventures in the forgotten realms":"afr",
+  "foundations":"fdn",
+
+  // Expansion
+  "arabian nights":"arn",
+  "antiquities":"atq",
+  "legends":"leg",
+  "the dark":"drk",
+  "fallen empires":"fem",
+  "homelands":"hml",
+  "ice age":"ice",
+  "ice age original":"ice2",
+  "alliances":"all",
+  "coldsnap":"csp",
+  "mirage":"mir",
+  "visions":"vis",
+  "weatherlight":"wth",
+  "tempest":"tmp",
+  "stronghold":"sth",
+  "exodus":"exo",
+  "urza's saga":"usg",
+  "urza's legacy":"ulg",
+  "urza's destiny":"uds",
+  "mercadian masques":"mmq",
+  "nemesis":"nem",
+  "prophecy":"pcy",
+  "invasion":"inv",
+  "planeshift":"pls",
+  "apocalypse":"apc",
+  "odyssey":"ody",
+  "torment":"tor",
+  "judgement":"jud",
+  "onslaught":"ons",
+  "legions":"lgn",
+  "scourge":"scg",
+  "mirrodin":"mrd",
+  "darksteel":"dst",
+  "fifth dawn":"5dn",
+  "champions of kamigawa":"chk",
+  "betrayers of kamigawa":"bok",
+  "saviors of kamigawa":"sok",
+  "ravnica":"rav",
+  "guildpact":"gpt",
+  "dissension":"dis",
+  "time spiral":"tsp",
+  "planar chaos":"plc",
+  "future sight":"fut",
+  "lorwyn":"lrw",
+  "morningtide":"mor",
+  "shadowmoor":"shm",
+  "eventide":"eve",
+  "shards of alara":"ala",
+  "conflux":"con",
+  "alara reborn":"arb",
+  "zendikar":"zen",
+  "worldwake":"wwk",
+  "rise of the eldrazi":"roe",
+  "scars of mirrodin":"som",
+  "mirrodin besieged":"mbs",
+  "new phyrexia":"nph",
+  "innistrad":"isd",
+  "dark ascension":"dka",
+  "avacyn restored":"avr",
+  "return to ravnica":"rtr",
+  "gatecrash":"gtc",
+  "dragon's maze":"dgm",
+  "theros":"ths",
+  "born of the gods":"bng",
+  "journey into nyx":"jou",
+  "khans of tarkir":"ktk",
+  "fate reforged":"frf",
+  "dragons of tarkir":"dtk",
+  "battle for zendikar":"bfz",
+  "oath of the gatewatch":"ogw",
+  "shadows over innistrad":"soi",
+  "eldritch moon":"emn",
+  "kaladesh":"kld",
+  "aether revolt":"aer",
+  "amonkhet":"akh",
+  "hour of devastation":"hou",
+  "ixalan":"xln",
+  "rivals of ixalan":"rix",
+  "dominaria":"dom",
+  "guilds of ravnica":"grn",
+  "ravnica allegiance":"rna",
+  "war of the spark":"war",
+  "throne of eldraine":"eld",
+  "theros beyond death":"thb",
+  "ikoria lair of behemoths":"iko",
+  "zendikar rising":"znr",
+  "kaldheim":"khm",
+  "strixhaven school of mages":"stx",
+  "innistrad midnight hunt":"mid",
+  "innistrad crimson vow":"vow",
+  "kamigawa neon dynasty":"neo",
+  "streets of new capenna":"snc",
+  "dominaria united":"dmu",
+  "the brothers' war":"bro",
+  "phyrexia all will be one":"one",
+  "march of the machine":"mom",
+  "march of the machine aftermath":"mat",
+  "wilds of eldraine":"woe",
+  "lost caverns of ixalan":"lci",
+  "murders at karlov manor":"mkm",
+  "outlaws of thunder junction":"otj",
+  "the big score":"big",
+  "bloomburrow":"blb",
+  "duskmourn house of horrors":"dsk",
+  "aetherdrift":"dft",
+  "tarkir dragonstorm":"tdm",
+  "final fantasy":"fin",
+  "edge of eternities":"eoe",
+  "marvel spider-man":"spm",
+  "avatar the last airbender":"tla",
+  "lorwyn eclipsed":"ecl",
+  "teenage mutant ninja turtles":"tmt",
+
+  // *** Command Zone Sets ***
+  "vanguard":"van",
+  "planechase":"hop",
+  "archenemy":"arc",
+  "commander":"cmd",
+  "planechase 2012":"pc2",
+  "commander's arsenal":"cm1",
+  "commander 2013":"c13",
+  "conspiracy":"cns",
+  "commander 2014":"c14",
+  "commander 2015":"c15",
+  "conspiracy 2 take the crown":"cn2",
+  "commander 2016":"c16",
+  "planechase anthology":"pca",
+  "commander anthology":"cma",
+  "archenemy nicol bolas":"e01",
+  "explorers of ixalan":"e02",
+  "commander 2017":"c17",
+  "commander anthology 2":"cm2",
+  "battlebond":"bbd",
+  "commander 2018":"c18",
+  "commander 2019":"c19",
+  "ikoria commander 2020":"c20",
+  "zendikar rising commander":"znc",
+  "commander collection green":"cc1",
+  "commander legends":"cmr",
+  "commander legends decks":"cmc",
+  "kaldheim commander":"khc",
+  "commander 2021":"c21",
+  "forgotten realms commander":"afc",
+  "midnight hunt commander":"mic",
+  "crimson vow commander":"voc",
+  "commander collection black":"cc2",
+  "kamigawa commander":"nec",
+  "streets of new capenna commander":"ncc",
+  "commander legends battle for baldurs gate":"clb",
+  "dominaria united commander":"dmc",
+  "warhammer 40k":"40k",
+  "the brothers war commander":"brc",
+  "phyrexia all will be one commander":"onc",
+  "march of the machine commander":"moc",
+  "starter commander decks":"scd",
+  "commander masters":"cmm",
+  "lord of the rings commander":"ltc",
+  "ub doctor who":"who",
+  "wilds of eldraine commander":"woc",
+  "lci commander":"lcc",
+  "ub fallout":"pip",
+  "mkm commander":"mkc",
+  "otj commander":"otc",
+  "bloomburrow commander":"blc",
+
+  // *** Reprint Sets ***
+  "chronicles":"chr",
+  "anthologies":"ath",
+  "battle royale":"brb",
+  "beatdown":"btd",
+  "deckmasters":"dkm",
+  "modern masters":"mma",
+  "modern masters 2015":"mm2",
+  "eternal masters":"ema",
+  "modern masters 2017":"mm3",
+  "renaissance":"ren",
+  "rinascimento":"rin",
+  "iconic masters":"ima",
+  "masters 25":"a25",
+  "ultimate masters":"uma",
+  "modern horizons":"mh1",
+  "modern horizons 2":"mh2",
+  "double masters":"2xm",
+  "jumpstart":"jmp",
+  "mystery booster":"mb1",
+  "modern horizons":"mh1",
+  "innistrad remastered":"inr",
+  "mystery booster 2":"mb2",
+  "jumpstart 2025":"j25",
+  "pioneer masters":"pio",
+  "ff through the ages":"fca",
+
+  // *** Beginner / Duel / Promo / Digital Sets ***
+  "portal":"por",
+  "portal 2":"p02",
+  "portal three kingdoms":"ptk",
+  "starter 1999":"s99",
+  "starter 2000":"s00",
+  "welcome deck 2016":"w16",
+  "welcome deck 2017":"w17",
+
+  "elves v goblins":"evg",
+  "jace v chandra":"dd2",
+  "universes beyond: assassin's creed":"acr",
+  "modern horizons 3":"mh3",
+  "the lord of the rings: tales of middle-earth":"ltr",
+
+
+  // …atd. (můžeš rozšířit s dalšími dle potřeby)
+};
+
+  // seznam všech typů boosterů
+const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"];
+
+// uložení do localStorage
+function saveTable() {
+  const tableData = [];
+  document.querySelectorAll("#table tbody tr").forEach(row => {
+    const rowData = {
+      name: row.querySelector(".card-name").innerText,
+      edition: row.querySelector(".card-edition").innerText,
+      boosters: []
+    };
+    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      if(cb.checked) rowData.boosters.push(cb.value);
+    });
+    tableData.push(rowData);
+  });
+  localStorage.setItem("mtgTableData", JSON.stringify(tableData));
 }
-let achievements = JSON.parse(localStorage.getItem("ach")) || []
 
-// SAVE
-function save(){
-  localStorage.setItem("sets",JSON.stringify(sets))
-  localStorage.setItem("game",JSON.stringify(game))
-  localStorage.setItem("ach",JSON.stringify(achievements))
+// načtení z localStorage
+async function save(){
+ localStorage.setItem("mtgSets",JSON.stringify(sets))
+ await setDoc(doc(db,"mtg","sets"),{data:sets})
 }
 
-// UI
-function toast(msg){
-  let t=document.getElementById("toast")
-  t.innerText=msg
-  t.style.display="block"
-  setTimeout(()=>t.style.display="none",2000)
+// počítání boosterů
+function countBoosters() {
+  const counts = {};
+  boosterTypes.forEach(type => counts[type] = 0);
+  document.querySelectorAll("#table tbody tr").forEach(row => {
+    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      if(cb.checked) counts[cb.value]++;
+    });
+  });
+  console.log("Počty boosterů:", counts);
 }
 
-// ADD SET
-function addSet(){
-  let name=setName.value
-  let count=parseInt(count.value)
+let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
 
-  let types=[]
-  document.querySelectorAll("input[type=checkbox]:checked")
-    .forEach(c=>types.push(c.value))
+function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }
+function createTags(types){ return types.map(t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`).join("") }
 
-  if(!name||types.length==0)return
-
-  sets.push({name,count,types})
-  setName.value=""
-  save()
-  render()
-}
-
-// RENDER
 function render(){
-  tbody.innerHTML=""
-  sets.forEach((s,i)=>{
-    tbody.innerHTML+=`
-    <tr>
-      <td>${s.name}</td>
-      <td>${s.count}</td>
-      <td>${s.types.map(t=>`<span class="tag">${t}</span>`).join("")}</td>
-      <td><button class="deleteBtn" onclick="del(${i})">X</button></td>
-    </tr>`
-  })
-  updateStats()
-  chartUpdate()
+    let tbody=document.querySelector("#table tbody")
+    tbody.innerHTML=""
+    sets.forEach((s,i)=>{
+        let key = s.keyrune
+        let iconHTML = key? `<i class="ss ss-${key} icon"></i>` : ""
+        tbody.innerHTML+=`
+<tr>
+<td>${iconHTML}${s.name}</td>
+<td>${s.count}</td>
+<td>${s.boxCount}</td>
+<td>${createTags(s.types)}</td>
+<td><button class="deleteBtn" onclick="removeSet(${i})">X</button></td>
+</tr>
+`
+    })
+    updateStats()
+    updateChart()
 }
 
-function del(i){
-  sets.splice(i,1)
-  save()
-  render()
+function addSet(){
+    let name=document.getElementById("setName").value.trim()
+    if(!name) return
+    let key = editionKeyrune[name.toLowerCase()] || ""
+    let count=parseInt(document.getElementById("count").value)
+    let boxCount=parseInt(document.getElementById("boxCount").value)
+    let types=[]
+    document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value); c.checked=false})
+    if(types.length==0) return
+    sets.push({name,keyrune:key,count,boxCount,types})
+    document.getElementById("setName").value=""
+    document.getElementById("count").value=1
+    document.getElementById("boxCount").value=0
+    save()
+    render()
 }
 
-// BOOSTER GAME
+function removeSet(i){ sets.splice(i,1); save(); render() }
+
+function searchTable(){
+    let f=document.getElementById("search").value.toLowerCase()
+    document.querySelectorAll("#table tbody tr").forEach(r=>{
+        r.style.display=r.children[0].innerText.toLowerCase().includes(f)?"":"none"
+    })
+}
+
+function updateStats(){
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
+    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
+    let total=0
+
+    sets.forEach(s=>{
+        s.types.forEach(t=>{
+            stats[t]+=s.count
+            total+=s.count
+        })
+    })
+
+    let top = Object.entries(stats).sort((a,b)=>b[1]-a[1])[0]
+
+    document.getElementById("stats").innerText=
+        `PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR} | PROMO: ${stats.PROMO} | JUMPSTART: ${stats.JUMPSTART} | BEYOND: ${stats.BEYOND} | PRERELEASEPROMO: ${stats.PRERELEASEPROMO} | THEME: ${stats.THEME}`
+        `Total boosters: ${total} | Top: ${top[0]} (${top[1]})`
+}
+
+function updateChart(){
+    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
+    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
+    let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR,stats.PROMO,stats.JUMPSTART,stats.BEYOND,stats.PRERELEASEPROMO,stats.THEME]
+    if(window.chart) chart.destroy()
+    window.chart=new Chart(document.getElementById("chart"),{
+        type:"pie",
+        data:{labels:["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"],datasets:[{data:data,backgroundColor:["#4caf50","#ff9800","#2196f3","#9c27b0"]}]}
+    })
+}
+
+function exportCSV(){
+    let csv="Edice,Pocet,Boxy,Typy\n"
+    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}"\n`})
+    let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a")
+    a.href=url;a.download="mtg_boostery.csv";a.click()
+}
+
+function exportJSON(){
+    let blob=new Blob([JSON.stringify(sets,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a")
+    a.href=url;a.download="mtg_boostery.json";a.click()
+}
+
+function importJSON(){
+    let input=document.createElement("input")
+    input.type="file"; input.accept=".json"
+    input.onchange=e=>{
+        let file=e.target.files[0]; if(!file) return
+        let reader=new FileReader()
+        reader.onload=ev=>{ sets=JSON.parse(ev.target.result); save(); render() }
+        reader.readAsText(file)
+    }
+    input.click()
+}
+
+function setLang(lang){
+    if(lang=="cz"){
+        title.innerText="ULTIMATE MTG Správce boosterů"
+        addBtn.innerText="Přidat"
+        search.placeholder="Vyhledat edici..."
+        colSet.innerText="Edice"
+        colCount.innerText="Počet"
+        colBox.innerText="Boxy"
+        colType.innerText="Typ"
+        colAction.innerText="Akce"
+    }
+    if(lang=="en"){
+        title.innerText="ULTIMATE MTG Booster Tracker"
+        addBtn.innerText="Add"
+        search.placeholder="Search set..."
+        colSet.innerText="Set"
+        colCount.innerText="Count"
+        colBox.innerText="Boxes"
+        colType.innerText="Type"
+        colAction.innerText="Action"
+    }
+}
+let statsGame = JSON.parse(localStorage.getItem("mtgGame")) || {
+  boosters:0,
+  mythics:0,
+  rares:0,
+  foils:0
+}
+
+function saveGame(){
+  localStorage.setItem("mtgGame", JSON.stringify(statsGame))
+}
+
 function openBooster(){
-  game.boosters++
+  statsGame.boosters++
 
-  let mythic=Math.random()<0.125
-  let result=mythic?"💎 MYTHIC":"🟡 Rare"
+  let isMythic = Math.random() < 0.125
+  let isFoil = Math.random() < 0.2
 
-  if(mythic) game.mythics++
-  else game.rares++
+  let result = isMythic ? "💎 MYTHIC!" : "🟡 Rare"
+  
+  if(isMythic) statsGame.mythics++
+  else statsGame.rares++
 
-  gameDiv.innerText=`Booster #${game.boosters}: ${result}`
+loadCloud()
+  if(isFoil){
+    statsGame.foils++
+    result += " + ✨ FOIL"
+  }
 
-  checkAch()
-  updateLuck()
-  save()
+  document.getElementById("gameLog").innerHTML =
+    `Opened booster #${statsGame.boosters}: ${result}`
+
+  updateLuckMeter()
+  checkAchievements()
+  saveGame()
 }
+ let unlocked = JSON.parse(localStorage.getItem("mtgAchievements")) || []
 
-// LUCK
-function updateLuck(){
-  let ratio=game.mythics/game.boosters
-  let text="Normal"
-
-  if(ratio>0.2) text="🔥 INSANE"
-  else if(ratio<0.05) text="💀 CURSED"
-
-  luck.innerText="Luck: "+text
-}
-
-// ACHIEVEMENTS
-function unlock(a){
-  if(!achievements.includes(a)){
-    achievements.push(a)
-    toast("🏆 "+a)
+function unlock(name){
+  if(!unlocked.includes(name)){
+    unlocked.push(name)
+    document.getElementById("achievements").innerHTML +=
+      `<div>🏆 ${name}</div>`
+    localStorage.setItem("mtgAchievements", JSON.stringify(unlocked))
   }
 }
 
-function checkAch(){
-  if(game.boosters>=1) unlock("First Booster")
-  if(game.boosters>=10) unlock("Addicted")
-  if(game.mythics>=3) unlock("Mythic Hunter")
+function checkAchievements(){
+  if(statsGame.boosters >= 1) unlock("First Booster")
+  if(statsGame.boosters >= 10) unlock("Booster Addict")
+  if(statsGame.mythics >= 3) unlock("Mythic Hunter")
+  if(sets.length >= 5) unlock("Collector")
 }
+function updateLuckMeter(){
+  let ratio = statsGame.mythics / statsGame.boosters
 
-// MYSTERY
-function mysteryEvent(){
-  let e=[
-    "💎 Black Lotus!!",
-    "😭 Trash booster",
-    "🔥 Double mythic!",
-    "✨ All foil!"
+  let text = "😐 Normal luck"
+
+  if(ratio > 0.2) text = "🔥 INSANE LUCK"
+  else if(ratio > 0.12) text = "😎 Lucky"
+  else if(ratio < 0.05) text = "💀 Cursed"
+
+  document.getElementById("luckMeter").innerText =
+    `Luck: ${text}`
+}
+ function mysteryEvent(){
+  let events = [
+    "💎 You pulled Black Lotus!!!",
+    "😭 All rares are trash",
+    "🔥 Double mythic booster!",
+    "✨ Everything is FOIL",
+    "📦 You found a hidden box"
   ]
-  gameDiv.innerText=e[Math.floor(Math.random()*e.length)]
+
+  let e = events[Math.floor(Math.random()*events.length)]
+
+  document.getElementById("gameLog").innerHTML = e
 }
-
-// STATS
-function updateStats(){
-  let total=sets.reduce((a,b)=>a+b.count,0)
-  stats.innerText="Total boosters: "+total
-}
-
-// CHART
-function chartUpdate(){
-  let total=sets.reduce((a,b)=>a+b.count,0)
-
-  if(window.chart) chart.destroy()
-  window.chart=new Chart(chart,{
-    type:"doughnut",
-    data:{
-      labels:["Boosters"],
-      datasets:[{data:[total],backgroundColor:["#4caf50"]}]
-    }
-  })
-}
-
-render()
-
+ loadCloud()
 </script>
+
 </body>
 </html>

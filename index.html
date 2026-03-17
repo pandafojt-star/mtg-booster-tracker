@@ -441,7 +441,6 @@ function searchTable(){
 
 function updateStats(){
     let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
-    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
     let total=0
 
     sets.forEach(s=>{
@@ -454,7 +453,6 @@ function updateStats(){
     let top = Object.entries(stats).sort((a,b)=>b[1]-a[1])[0]
 
     document.getElementById("stats").innerText=
-        `PLAY: ${stats.PLAY} | SET: ${stats.SET} | DRAFT: ${stats.DRAFT} | COLLECTOR: ${stats.COLLECTOR} | PROMO: ${stats.PROMO} | JUMPSTART: ${stats.JUMPSTART} | BEYOND: ${stats.BEYOND} | PRERELEASEPROMO: ${stats.PRERELEASEPROMO} | THEME: ${stats.THEME}`
         `Total boosters: ${total} | Top: ${top[0]} (${top[1]})`
 }
 
@@ -537,7 +535,7 @@ function openBooster(){
   if(isMythic) statsGame.mythics++
   else statsGame.rares++
 
-loadCloud()
+
   if(isFoil){
     statsGame.foils++
     result += " + ✨ FOIL"

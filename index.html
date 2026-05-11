@@ -1,597 +1,2225 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-
-
-<meta charset="windows-1250">
-<title>ULTIMATE MTG Tracker</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MTG Booster Tracker</title>
+<meta name="description" content="Stylovy MTG booster tracker se statistikami, importem/exportem a malym booster simulatorom.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/keyrune/css/keyrune.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#1e1e2f,#2b2b40);color:white;padding:20px;margin:0;}
-h2{text-align:center;}
-.panel{background:#2f2f4f;padding:15px;border-radius:10px;margin-bottom:20px;}
-input, select{padding:7px;border-radius:6px;border:none;margin-right:8px;}
-button{padding:7px 14px;border:none;border-radius:6px;background:#4caf50;color:white;font-weight:bold;cursor:pointer;margin-right:5px;}
-button:hover{background:#43a047;}
-.exportBtn{background:#ff9800;}
-.deleteBtn{background:#e53935;}
-table{width:100%;border-collapse:collapse;background:white;color:#222;border-radius:10px;overflow:hidden;}
-th{background:#3b3b6d;color:white;padding:10px;}
-td{padding:10px;border-bottom:1px solid #ddd;vertical-align: middle;}
-.tag{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:bold;margin-right:4px;display:inline-block;color:white;}
-.play{background:#4caf50;}
-.draft{background:#2196f3;}
-.set{background:#ff9800;}
-.collector{background:#9c27b0;}
-.promo{background:#14DF87;}
-.jumpstart{background:#DF14B7;}
-.beyond{background:#66A23E;}
-.prereleasepromo{background:#E5CCFF;}
-.theme{background:#970EA1;}
-.icon{font-size:24px; vertical-align:middle; margin-right:5px;}
-.lang{float:right;}
-@media(max-width:700px){
-  table, thead, tbody, th, td, tr{display:block;}
-  th{display:none;}
-  td{border:none;position:relative;padding-left:50%;}
-  td:before{position:absolute;left:10px;top:10px;width:45%;white-space:nowrap;font-weight:bold;color:#fff;}
-  td:nth-of-type(1):before{content:"Edice";}
-  td:nth-of-type(2):before{content:"Počet";}
-  td:nth-of-type(3):before{content:"Boxy";}
-  td:nth-of-type(4):before{content:"Typ";}
-  td:nth-of-type(5):before{content:"Akce";}
+:root{
+  --bg:#08110d;
+  --bg-soft:#0f1e18;
+  --surface:rgba(15,25,21,0.8);
+  --surface-strong:rgba(18,31,26,0.96);
+  --surface-alt:rgba(255,255,255,0.05);
+  --border:rgba(194,178,119,0.18);
+  --text:#f4f1e5;
+  --muted:#b7b3a4;
+  --accent:#d2b56d;
+  --accent-strong:#f1c862;
+  --accent-2:#78c9a1;
+  --danger:#ff7b72;
+  --shadow:0 20px 50px rgba(0,0,0,0.35);
+  --radius-xl:28px;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --type-play:#72c885;
+  --type-set:#f0b55b;
+  --type-draft:#63a8ff;
+  --type-collector:#c58bff;
+  --type-promo:#53d7b0;
+  --type-jumpstart:#ef7bbb;
+  --type-beyond:#9ccb55;
+  --type-prereleasepromo:#e9d5ff;
+  --type-theme:#d563df;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:"Space Grotesk",sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(120,201,161,0.2), transparent 28%),
+    radial-gradient(circle at top right, rgba(210,181,109,0.18), transparent 26%),
+    linear-gradient(140deg, #07100d 0%, #102019 52%, #15271f 100%);
+  overflow-x:hidden;
+}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  width:32rem;
+  height:32rem;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:0.16;
+  pointer-events:none;
+  z-index:0;
+}
+body::before{
+  top:-8rem;
+  left:-8rem;
+  background:#78c9a1;
+}
+body::after{
+  right:-10rem;
+  bottom:-12rem;
+  background:#d2b56d;
+}
+button,
+input,
+select{
+  font:inherit;
+}
+button{
+  border:none;
+  cursor:pointer;
+}
+.app-shell{
+  position:relative;
+  z-index:1;
+  width:min(1180px, calc(100% - 2rem));
+  margin:0 auto;
+  padding:1.25rem 0 2.5rem;
+}
+.card{
+  background:linear-gradient(180deg, rgba(25,38,32,0.92), rgba(11,20,16,0.92));
+  border:1px solid var(--border);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px);
+}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap:1.5rem;
+  padding:1.8rem;
+  overflow:hidden;
+  position:relative;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:-20% auto auto 45%;
+  width:18rem;
+  height:18rem;
+  background:radial-gradient(circle, rgba(241,200,98,0.18), transparent 68%);
+  transform:translateZ(0);
+}
+.eyebrow{
+  margin:0 0 0.55rem;
+  color:var(--accent);
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.76rem;
+  font-weight:700;
+}
+.hero h1{
+  margin:0;
+  font-family:"Cinzel",serif;
+  font-size:clamp(2rem, 4vw, 3.6rem);
+  line-height:1.04;
+}
+.hero-text{
+  margin:0.85rem 0 0;
+  max-width:58ch;
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1.65;
+}
+.hero-panel{
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:1rem;
+  padding:1rem;
+  border-radius:calc(var(--radius-xl) - 8px);
+  background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border:1px solid rgba(255,255,255,0.08);
+}
+.hero-kicker{
+  margin:0;
+  color:var(--muted);
+  line-height:1.55;
+}
+.lang-switch{
+  display:inline-flex;
+  gap:0.5rem;
+  padding:0.35rem;
+  border-radius:999px;
+  background:rgba(255,255,255,0.05);
+  width:max-content;
+}
+.lang-switch button{
+  min-width:3rem;
+  padding:0.7rem 1rem;
+  border-radius:999px;
+  color:var(--text);
+  background:transparent;
+  transition:transform 180ms ease, background 180ms ease, color 180ms ease;
+}
+.lang-switch button.active{
+  background:linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color:#1b1504;
+  font-weight:700;
+}
+.storage-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:0.55rem;
+  width:max-content;
+  padding:0.65rem 0.9rem;
+  border-radius:999px;
+  background:rgba(120,201,161,0.08);
+  color:var(--muted);
+  font-size:0.92rem;
+}
+.storage-dot{
+  width:0.65rem;
+  height:0.65rem;
+  border-radius:50%;
+  background:var(--accent-2);
+  box-shadow:0 0 0 6px rgba(120,201,161,0.12);
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(5, minmax(0, 1fr));
+  gap:1rem;
+  margin-top:1rem;
+}
+.stat-card{
+  padding:1.2rem 1.1rem;
+  position:relative;
+  overflow:hidden;
+}
+.stat-card::after{
+  content:"";
+  position:absolute;
+  top:-2.5rem;
+  right:-2.5rem;
+  width:7rem;
+  height:7rem;
+  background:radial-gradient(circle, rgba(255,255,255,0.1), transparent 70%);
+}
+.stat-label{
+  display:block;
+  color:var(--muted);
+  font-size:0.84rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+.stat-value{
+  margin-top:0.75rem;
+  display:block;
+  font-size:clamp(1.4rem, 3vw, 2rem);
+  font-weight:700;
+}
+.stat-meta{
+  margin-top:0.45rem;
+  color:#d4cdb9;
+  font-size:0.95rem;
+}
+.content-grid{
+  display:grid;
+  grid-template-columns:minmax(0, 1.1fr) minmax(340px, 0.9fr);
+  gap:1rem;
+  margin-top:1rem;
+}
+.section-card{
+  padding:1.35rem;
+}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:flex-start;
+  margin-bottom:1rem;
+}
+.section-head h2{
+  margin:0;
+  font-family:"Cinzel",serif;
+  font-size:1.3rem;
+}
+.section-head p{
+  margin:0.4rem 0 0;
+  color:var(--muted);
+  line-height:1.55;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1.6fr repeat(2, minmax(92px, 0.5fr));
+  gap:0.85rem;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:0.4rem;
+}
+.field label{
+  color:var(--muted);
+  font-size:0.92rem;
+}
+.field input,
+.field select{
+  width:100%;
+  padding:0.9rem 1rem;
+  color:var(--text);
+  background:var(--surface-alt);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius-md);
+  outline:none;
+  transition:border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+.field input:focus,
+.field select:focus{
+  border-color:rgba(210,181,109,0.6);
+  background:rgba(255,255,255,0.08);
+  transform:translateY(-1px);
+}
+.type-picker{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:0.7rem;
+  margin-top:1rem;
+}
+.type-option{
+  position:relative;
+}
+.type-option button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.65rem;
+  padding:0.85rem 0.95rem;
+  background:rgba(255,255,255,0.045);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:var(--radius-md);
+  transition:transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+.type-option button:hover,
+.type-option button:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,0.16);
+}
+.type-option button.active{
+  background:rgba(255,255,255,0.1);
+  border-color:var(--type-color);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.04), 0 12px 28px rgba(0,0,0,0.2);
+}
+.type-swatch{
+  width:0.85rem;
+  height:0.85rem;
+  border-radius:50%;
+  background:var(--type-color);
+  box-shadow:0 0 0 5px color-mix(in srgb, var(--type-color) 16%, transparent);
+}
+.type-label{
+  flex:1;
+  text-align:left;
+  font-weight:700;
+}
+.form-actions,
+.utility-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.75rem;
+  margin-top:1rem;
+}
+.button-primary,
+.button-secondary,
+.button-ghost,
+.button-danger{
+  padding:0.88rem 1.15rem;
+  border-radius:999px;
+  transition:transform 180ms ease, filter 180ms ease, background 180ms ease, color 180ms ease;
+}
+.button-primary:hover,
+.button-secondary:hover,
+.button-ghost:hover,
+.button-danger:hover{
+  transform:translateY(-1px);
+  filter:saturate(1.05);
+}
+.button-primary{
+  background:linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color:#1e1604;
+  font-weight:700;
+}
+.button-secondary{
+  background:linear-gradient(135deg, rgba(120,201,161,0.9), rgba(85,170,133,0.92));
+  color:#08110d;
+  font-weight:700;
+}
+.button-ghost{
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.08);
+}
+.button-danger{
+  background:rgba(255,123,114,0.14);
+  color:#ffd5d2;
+  border:1px solid rgba(255,123,114,0.2);
+}
+.utility-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.75rem;
+}
+.mini-card{
+  padding:1rem;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.06);
+}
+.mini-card h3{
+  margin:0;
+  font-size:1rem;
+}
+.mini-card p{
+  margin:0.45rem 0 0;
+  color:var(--muted);
+  line-height:1.5;
+  font-size:0.92rem;
+}
+.sim-output{
+  min-height:4rem;
+  margin-top:1rem;
+  padding:1rem;
+  border-radius:var(--radius-lg);
+  background:rgba(0,0,0,0.24);
+  border:1px solid rgba(255,255,255,0.06);
+  color:var(--text);
+  line-height:1.55;
+}
+.sim-context{
+  margin-top:0.85rem;
+  padding:0.9rem 1rem;
+  border-radius:var(--radius-lg);
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  color:var(--muted);
+  line-height:1.55;
+}
+.sim-context strong,
+.sim-history-item strong{
+  color:var(--text);
+}
+.sim-history{
+  margin-top:0.95rem;
+}
+.sim-history-title{
+  color:var(--muted);
+  font-size:0.84rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  margin-bottom:0.6rem;
+}
+.sim-history-list{
+  display:flex;
+  flex-direction:column;
+  gap:0.6rem;
+}
+.sim-history-item{
+  padding:0.8rem 0.9rem;
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.05);
+}
+.sim-history-meta{
+  display:block;
+  margin-top:0.28rem;
+  color:var(--muted);
+  font-size:0.88rem;
+}
+.achievement-list{
+  margin-top:0.9rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.55rem;
+}
+.achievement-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:0.45rem;
+  padding:0.55rem 0.8rem;
+  border-radius:999px;
+  background:rgba(210,181,109,0.11);
+  color:#f3e1af;
+  border:1px solid rgba(210,181,109,0.18);
+  font-size:0.92rem;
+}
+.collection-card,
+.analytics-card{
+  margin-top:1rem;
+  padding:1.35rem;
+}
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.85rem;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:1rem;
+}
+.toolbar-left,
+.toolbar-right{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.85rem;
+  align-items:flex-end;
+}
+.toolbar .field{
+  min-width:180px;
+}
+.entry-header,
+.entry-row{
+  display:grid;
+  grid-template-columns:minmax(0, 2.4fr) 0.8fr 0.8fr 1.15fr auto;
+  gap:0.8rem;
+  align-items:center;
+}
+.entry-header{
+  padding:0 0.75rem 0.7rem;
+  color:var(--muted);
+  font-size:0.82rem;
+  letter-spacing:0.09em;
+  text-transform:uppercase;
+}
+.entry-list{
+  display:flex;
+  flex-direction:column;
+  gap:0.7rem;
+}
+.desktop-value{
+  display:block;
+}
+.entry-meta-grid{
+  display:none;
+}
+.entry-row{
+  padding:0.9rem 1rem;
+  background:rgba(255,255,255,0.04);
+  border-radius:var(--radius-lg);
+  border:1px solid rgba(255,255,255,0.05);
+  transition:transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+.entry-row:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.1);
+}
+.set-main{
+  display:flex;
+  align-items:center;
+  gap:0.9rem;
+  min-width:0;
+}
+.set-icon{
+  flex:0 0 auto;
+  width:2.6rem;
+  height:2.6rem;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:radial-gradient(circle at top, rgba(210,181,109,0.24), rgba(255,255,255,0.04));
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--accent-strong);
+}
+.set-icon i{
+  font-size:1.3rem;
+}
+.set-icon-fallback{
+  font-weight:700;
+  color:#f2d08a;
+}
+.set-copy{
+  min-width:0;
+}
+.set-name{
+  margin:0;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.set-date{
+  margin-top:0.2rem;
+  color:var(--muted);
+  font-size:0.9rem;
+}
+.entry-value{
+  font-weight:700;
+}
+.type-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.45rem;
+  width:max-content;
+  padding:0.55rem 0.8rem;
+  border-radius:999px;
+  background:color-mix(in srgb, var(--type-color) 18%, rgba(255,255,255,0.02));
+  color:var(--type-color);
+  border:1px solid color-mix(in srgb, var(--type-color) 30%, rgba(255,255,255,0.06));
+  font-weight:700;
+  font-size:0.88rem;
+}
+.entry-actions{
+  display:flex;
+  justify-content:flex-end;
+}
+.entry-actions button{
+  min-width:2.7rem;
+  height:2.7rem;
+  border-radius:50%;
+  background:rgba(255,123,114,0.16);
+  color:#ffd7d2;
+  border:1px solid rgba(255,123,114,0.22);
+}
+.empty-state{
+  display:none;
+  padding:2rem 1rem 1.2rem;
+  text-align:center;
+  color:var(--muted);
+}
+.empty-state.visible{
+  display:block;
+}
+.analytics-grid{
+  display:grid;
+  grid-template-columns:minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  gap:1rem;
+  align-items:stretch;
+}
+.chart-card{
+  min-height:340px;
+  padding:1rem;
+  border-radius:var(--radius-lg);
+  background:rgba(0,0,0,0.18);
+  border:1px solid rgba(255,255,255,0.06);
+  position:relative;
+}
+.chart-card canvas{
+  width:100%;
+  height:100%;
+}
+.chart-empty{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:1.5rem;
+  color:var(--muted);
+}
+.chart-empty.visible{
+  display:flex;
+}
+.breakdown{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0.65rem;
+}
+.breakdown-card{
+  padding:0.9rem 1rem;
+  border-radius:var(--radius-lg);
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.05);
+}
+.breakdown-top{
+  display:flex;
+  justify-content:space-between;
+  gap:0.85rem;
+  align-items:center;
+}
+.breakdown-label{
+  display:flex;
+  align-items:center;
+  gap:0.55rem;
+  font-weight:700;
+}
+.breakdown-bar{
+  margin-top:0.75rem;
+  height:0.48rem;
+  border-radius:999px;
+  background:rgba(255,255,255,0.06);
+  overflow:hidden;
+}
+.breakdown-bar span{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:var(--type-color);
+}
+.toast{
+  position:fixed;
+  right:1rem;
+  bottom:1rem;
+  padding:0.95rem 1.1rem;
+  border-radius:18px;
+  background:rgba(12,20,16,0.96);
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);
+  box-shadow:0 18px 40px rgba(0,0,0,0.4);
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:opacity 220ms ease, transform 220ms ease;
+  max-width:min(92vw, 360px);
+  z-index:3;
+}
+.toast.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+@keyframes floatIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero,
+.stats-grid > .card,
+.content-grid > .card,
+.collection-card,
+.analytics-card{
+  animation:floatIn 460ms ease both;
+}
+.stats-grid > .card:nth-child(2){animation-delay:60ms}
+.stats-grid > .card:nth-child(3){animation-delay:120ms}
+.stats-grid > .card:nth-child(4){animation-delay:180ms}
+.stats-grid > .card:nth-child(5){animation-delay:240ms}
+@media (max-width: 1080px){
+  .stats-grid{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+  }
+  .content-grid,
+  .analytics-grid,
+  .hero{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width: 820px){
+  .app-shell{
+    width:min(100% - 1rem, 1180px);
+    padding-top:0.7rem;
+  }
+  .stats-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+  .form-grid,
+  .utility-grid,
+  .type-picker{
+    grid-template-columns:1fr;
+  }
+  .entry-header{
+    display:none;
+  }
+  .entry-row{
+    grid-template-columns:1fr;
+    gap:0.7rem;
+  }
+  .desktop-value{
+    display:none;
+  }
+  .entry-actions{
+    justify-content:flex-start;
+  }
+  .entry-meta-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:0.6rem;
+  }
+  .entry-meta-cell{
+    padding:0.75rem;
+    border-radius:var(--radius-md);
+    background:rgba(255,255,255,0.04);
+  }
+  .entry-meta-label{
+    display:block;
+    color:var(--muted);
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin-bottom:0.35rem;
+  }
+}
+@media (max-width: 580px){
+  .stats-grid{
+    grid-template-columns:1fr;
+  }
+  .toolbar,
+  .toolbar-left,
+  .toolbar-right{
+    align-items:stretch;
+  }
+  .toolbar .field{
+    min-width:0;
+    width:100%;
+  }
+  .entry-meta-grid{
+    grid-template-columns:1fr;
+  }
+  .form-actions .button-primary,
+  .form-actions .button-ghost,
+  .utility-actions button{
+    width:100%;
+    justify-content:center;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,
+  *::before,
+  *::after{
+    animation:none !important;
+    transition:none !important;
+  }
 }
 </style>
 </head>
 <body>
+<main class="app-shell">
+  <section class="hero card">
+    <div>
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 id="pageTitle"></h1>
+      <p class="hero-text" data-i18n="heroText"></p>
+    </div>
+    <div class="hero-panel">
+      <div>
+        <div class="lang-switch" role="group" aria-label="Language switcher">
+          <button type="button" data-lang-btn="cs">CZ</button>
+          <button type="button" data-lang-btn="en">EN</button>
+        </div>
+      </div>
+      <p class="hero-kicker" data-i18n="heroKicker"></p>
+      <div class="storage-pill">
+        <span class="storage-dot" aria-hidden="true"></span>
+        <span data-i18n="storageSaved"></span>
+      </div>
+    </div>
+  </section>
 
-<h2 id="title">ULTIMATE MTG Booster Tracker</h2>
+  <section class="stats-grid">
+    <article class="card stat-card">
+      <span class="stat-label" data-i18n="statTotalBoosters"></span>
+      <strong class="stat-value" id="statTotalBoostersValue">0</strong>
+      <div class="stat-meta" id="statTotalBoostersMeta"></div>
+    </article>
+    <article class="card stat-card">
+      <span class="stat-label" data-i18n="statTrackedSets"></span>
+      <strong class="stat-value" id="statTrackedSetsValue">0</strong>
+      <div class="stat-meta" id="statTrackedSetsMeta"></div>
+    </article>
+    <article class="card stat-card">
+      <span class="stat-label" data-i18n="statBoxes"></span>
+      <strong class="stat-value" id="statBoxesValue">0</strong>
+      <div class="stat-meta" id="statBoxesMeta"></div>
+    </article>
+    <article class="card stat-card">
+      <span class="stat-label" data-i18n="statTopType"></span>
+      <strong class="stat-value" id="statTopTypeValue">-</strong>
+      <div class="stat-meta" id="statTopTypeMeta"></div>
+    </article>
+    <article class="card stat-card">
+      <span class="stat-label" data-i18n="statLuck"></span>
+      <strong class="stat-value" id="statLuckValue">-</strong>
+      <div class="stat-meta" id="statLuckMeta"></div>
+    </article>
+  </section>
 
-<div class="lang">
-<button onclick="setLang('cz')">🇨🇿</button>
-<button onclick="setLang('en')">🇬🇧</button>
-</div>
+  <section class="content-grid">
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="addEntryTitle"></h2>
+          <p data-i18n="addEntryText"></p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="setName" data-i18n="fieldSetName"></label>
+          <input id="setName" list="setSuggestions" autocomplete="off">
+          <datalist id="setSuggestions"></datalist>
+        </div>
+        <div class="field">
+          <label for="count" data-i18n="fieldCount"></label>
+          <input id="count" type="number" min="1" value="1">
+        </div>
+        <div class="field">
+          <label for="boxCount" data-i18n="fieldBoxes"></label>
+          <input id="boxCount" type="number" min="0" value="0">
+        </div>
+      </div>
 
-<div class="panel">
-<input id="setName" placeholder="Název edice">
-<input id="count" type="number" min="1" value="1" style="width:70px">
-<input id="boxCount" type="number" min="0" value="0" style="width:70px" title="Počet boxů">
- <button onclick="openBooster()">🎮 Open Booster</button>
-<button onclick="mysteryEvent()">🎁 Mystery</button>
+      <div class="section-head" style="margin-top:1rem;margin-bottom:0.7rem;">
+        <div>
+          <h2 data-i18n="typeTitle"></h2>
+          <p data-i18n="typeText"></p>
+        </div>
+      </div>
+      <div class="type-picker" id="typePicker"></div>
 
-<div id="gameLog" style="margin-top:10px;font-size:14px;"></div>
-<div id="achievements" style="margin-top:10px;"></div>
-<div id="luckMeter" style="margin-top:10px;font-weight:bold;"></div>
+      <div class="form-actions">
+        <button type="button" class="button-primary" id="addButton"></button>
+        <button type="button" class="button-ghost" id="clearFormButton"></button>
+      </div>
+    </section>
 
-<!-- Typy boosterů / checkboxy -->
-<div id="booster-types">
-  <label><input type="checkbox" value="PLAY"> PLAY</label>
-  <label><input type="checkbox" value="SET"> SET</label>
-  <label><input type="checkbox" value="DRAFT"> DRAFT</label>
-  <label><input type="checkbox" value="COLLECTOR"> COLLECTOR</label>
-  <label><input type="checkbox" value="PROMO"> PROMO</label>
-  <label><input type="checkbox" value="JUMPSTART"> JUMPSTART</label>
-  <label><input type="checkbox" value="BEYOND"> BEYOND</label>
-  <label><input type="checkbox" value="PRERELEASEPROMO"> PRERELEASEPROMO</label>
-  <label><input type="checkbox" value="THEME"> THEME</label>
-</div>
+    <section class="card section-card">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="toolsTitle"></h2>
+          <p data-i18n="toolsText"></p>
+        </div>
+      </div>
 
-<button onclick="addSet()" id="addBtn">Přidat</button>
-<button class="exportBtn" onclick="exportCSV()">Export CSV</button>
-<button onclick="importJSON()">Import JSON</button>
-<button onclick="exportJSON()">Export JSON</button>
+      <div class="utility-grid">
+        <article class="mini-card">
+          <h3 data-i18n="exportsTitle"></h3>
+          <p data-i18n="exportsText"></p>
+          <div class="utility-actions">
+            <button type="button" class="button-secondary" id="exportCsvButton"></button>
+            <button type="button" class="button-ghost" id="exportJsonButton"></button>
+            <button type="button" class="button-ghost" id="importJsonButton"></button>
+          </div>
+        </article>
+        <article class="mini-card">
+          <h3 data-i18n="simTitle"></h3>
+          <p data-i18n="simText"></p>
+          <div class="utility-actions">
+            <button type="button" class="button-secondary" id="openBoosterButton"></button>
+            <button type="button" class="button-ghost" id="mysteryButton"></button>
+          </div>
+          <div class="sim-context" id="simContext"></div>
+        </article>
+      </div>
 
-<br><br>
-<input id="search" placeholder="Vyhledat edici..." onkeyup="searchTable()">
-<div id="stats" style="margin-top:10px;font-weight:bold;"></div>
-</div>
+      <div class="sim-output" id="simOutput"></div>
+      <div class="sim-history">
+        <div class="sim-history-title" data-i18n="simHistoryTitle"></div>
+        <div class="sim-history-list" id="simHistoryList"></div>
+      </div>
+      <div class="achievement-list" id="achievementList"></div>
 
-<table id="table">
-<thead>
-<tr>
-<th id="colSet">Edice</th>
-<th id="colCount">Počet</th>
-<th id="colBox">Boxy</th>
-<th id="colType">Typ</th>
-<th id="colAction">Akce</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+      <div class="utility-actions" style="margin-top:1rem;">
+        <button type="button" class="button-danger" id="clearDataButton"></button>
+      </div>
+    </section>
+  </section>
 
-<br><br>
-<canvas id="chart"></canvas>
+  <section class="card collection-card">
+    <div class="section-head">
+      <div>
+        <h2 data-i18n="collectionTitle"></h2>
+        <p id="collectionSummary"></p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="field">
+          <label for="searchInput" data-i18n="searchLabel"></label>
+          <input id="searchInput" autocomplete="off">
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <div class="field">
+          <label for="sortSelect" data-i18n="sortLabel"></label>
+          <select id="sortSelect"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-header">
+      <span data-i18n="headerSet"></span>
+      <span data-i18n="headerCount"></span>
+      <span data-i18n="headerBoxes"></span>
+      <span data-i18n="headerType"></span>
+      <span data-i18n="headerActions"></span>
+    </div>
+    <div class="entry-list" id="entryList"></div>
+    <div class="empty-state" id="emptyState" data-i18n="emptyState"></div>
+  </section>
+
+  <section class="card analytics-card">
+    <div class="section-head">
+      <div>
+        <h2 data-i18n="analyticsTitle"></h2>
+        <p data-i18n="analyticsText"></p>
+      </div>
+    </div>
+    <div class="analytics-grid">
+      <div class="chart-card">
+        <canvas id="chart"></canvas>
+        <div class="chart-empty" id="chartEmpty" data-i18n="chartEmpty"></div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+    </div>
+  </section>
+</main>
+
+<input id="importInput" class="sr-only" type="file" accept=".json">
+<div class="toast" id="toast"></div>
 
 <script>
-const editionKeyrune = {
-
-  // Core Sets
-  "alpha":"lea",
-  "beta":"leb",
-  "unlimited":"2ed",
-  "revised":"3ed",
-  "alpha online":"1e",
-  "beta online":"2e",
-  "unlimited online":"2u",
-  "revised online":"3e",
-  "fourth edition":"4ed",
-  "summer magic":"psum",
-  "fifth edition":"5ed",
-  "sixth edition":"6ed",
-  "seventh edition":"7ed",
-  "eighth edition":"8ed",
-  "ninth edition":"9ed",
-  "tenth edition":"10e",
-  "magic 2010":"m10",
-  "magic 2011":"m11",
-  "magic 2012":"m12",
-  "magic 2013":"m13",
-  "magic 2014":"m14",
-  "magic 2015":"m15",
-  "blank core set":"bcore",
-  "magic origins":"ori",
-  "magic 2019":"m19",
-  "magic 2020":"m20",
-  "core 2021":"m21",
-  "adventures in the forgotten realms":"afr",
-  "foundations":"fdn",
-
-  // Expansion
-  "arabian nights":"arn",
-  "antiquities":"atq",
-  "legends":"leg",
-  "the dark":"drk",
-  "fallen empires":"fem",
-  "homelands":"hml",
-  "ice age":"ice",
-  "ice age original":"ice2",
-  "alliances":"all",
-  "coldsnap":"csp",
-  "mirage":"mir",
-  "visions":"vis",
-  "weatherlight":"wth",
-  "tempest":"tmp",
-  "stronghold":"sth",
-  "exodus":"exo",
-  "urza's saga":"usg",
-  "urza's legacy":"ulg",
-  "urza's destiny":"uds",
-  "mercadian masques":"mmq",
-  "nemesis":"nem",
-  "prophecy":"pcy",
-  "invasion":"inv",
-  "planeshift":"pls",
-  "apocalypse":"apc",
-  "odyssey":"ody",
-  "torment":"tor",
-  "judgement":"jud",
-  "onslaught":"ons",
-  "legions":"lgn",
-  "scourge":"scg",
-  "mirrodin":"mrd",
-  "darksteel":"dst",
-  "fifth dawn":"5dn",
-  "champions of kamigawa":"chk",
-  "betrayers of kamigawa":"bok",
-  "saviors of kamigawa":"sok",
-  "ravnica":"rav",
-  "guildpact":"gpt",
-  "dissension":"dis",
-  "time spiral":"tsp",
-  "planar chaos":"plc",
-  "future sight":"fut",
-  "lorwyn":"lrw",
-  "morningtide":"mor",
-  "shadowmoor":"shm",
-  "eventide":"eve",
-  "shards of alara":"ala",
-  "conflux":"con",
-  "alara reborn":"arb",
-  "zendikar":"zen",
-  "worldwake":"wwk",
-  "rise of the eldrazi":"roe",
-  "scars of mirrodin":"som",
-  "mirrodin besieged":"mbs",
-  "new phyrexia":"nph",
-  "innistrad":"isd",
-  "dark ascension":"dka",
-  "avacyn restored":"avr",
-  "return to ravnica":"rtr",
-  "gatecrash":"gtc",
-  "dragon's maze":"dgm",
-  "theros":"ths",
-  "born of the gods":"bng",
-  "journey into nyx":"jou",
-  "khans of tarkir":"ktk",
-  "fate reforged":"frf",
-  "dragons of tarkir":"dtk",
-  "battle for zendikar":"bfz",
-  "oath of the gatewatch":"ogw",
-  "shadows over innistrad":"soi",
-  "eldritch moon":"emn",
-  "kaladesh":"kld",
-  "aether revolt":"aer",
-  "amonkhet":"akh",
-  "hour of devastation":"hou",
-  "ixalan":"xln",
-  "rivals of ixalan":"rix",
-  "dominaria":"dom",
-  "guilds of ravnica":"grn",
-  "ravnica allegiance":"rna",
-  "war of the spark":"war",
-  "throne of eldraine":"eld",
-  "theros beyond death":"thb",
-  "ikoria lair of behemoths":"iko",
-  "zendikar rising":"znr",
-  "kaldheim":"khm",
-  "strixhaven school of mages":"stx",
-  "innistrad midnight hunt":"mid",
-  "innistrad crimson vow":"vow",
-  "kamigawa neon dynasty":"neo",
-  "streets of new capenna":"snc",
-  "dominaria united":"dmu",
-  "the brothers' war":"bro",
-  "phyrexia all will be one":"one",
-  "march of the machine":"mom",
-  "march of the machine aftermath":"mat",
-  "wilds of eldraine":"woe",
-  "lost caverns of ixalan":"lci",
-  "murders at karlov manor":"mkm",
-  "outlaws of thunder junction":"otj",
-  "the big score":"big",
-  "bloomburrow":"blb",
-  "duskmourn house of horrors":"dsk",
-  "aetherdrift":"dft",
-  "tarkir dragonstorm":"tdm",
-  "final fantasy":"fin",
-  "edge of eternities":"eoe",
-  "marvel spider-man":"spm",
-  "avatar the last airbender":"tla",
-  "lorwyn eclipsed":"ecl",
-  "teenage mutant ninja turtles":"tmt",
-
-  // *** Command Zone Sets ***
-  "vanguard":"van",
-  "planechase":"hop",
-  "archenemy":"arc",
-  "commander":"cmd",
-  "planechase 2012":"pc2",
-  "commander's arsenal":"cm1",
-  "commander 2013":"c13",
-  "conspiracy":"cns",
-  "commander 2014":"c14",
-  "commander 2015":"c15",
-  "conspiracy 2 take the crown":"cn2",
-  "commander 2016":"c16",
-  "planechase anthology":"pca",
-  "commander anthology":"cma",
-  "archenemy nicol bolas":"e01",
-  "explorers of ixalan":"e02",
-  "commander 2017":"c17",
-  "commander anthology 2":"cm2",
-  "battlebond":"bbd",
-  "commander 2018":"c18",
-  "commander 2019":"c19",
-  "ikoria commander 2020":"c20",
-  "zendikar rising commander":"znc",
-  "commander collection green":"cc1",
-  "commander legends":"cmr",
-  "commander legends decks":"cmc",
-  "kaldheim commander":"khc",
-  "commander 2021":"c21",
-  "forgotten realms commander":"afc",
-  "midnight hunt commander":"mic",
-  "crimson vow commander":"voc",
-  "commander collection black":"cc2",
-  "kamigawa commander":"nec",
-  "streets of new capenna commander":"ncc",
-  "commander legends battle for baldurs gate":"clb",
-  "dominaria united commander":"dmc",
-  "warhammer 40k":"40k",
-  "the brothers war commander":"brc",
-  "phyrexia all will be one commander":"onc",
-  "march of the machine commander":"moc",
-  "starter commander decks":"scd",
-  "commander masters":"cmm",
-  "lord of the rings commander":"ltc",
-  "ub doctor who":"who",
-  "wilds of eldraine commander":"woc",
-  "lci commander":"lcc",
-  "ub fallout":"pip",
-  "mkm commander":"mkc",
-  "otj commander":"otc",
-  "bloomburrow commander":"blc",
-
-  // *** Reprint Sets ***
-  "chronicles":"chr",
-  "anthologies":"ath",
-  "battle royale":"brb",
-  "beatdown":"btd",
-  "deckmasters":"dkm",
-  "modern masters":"mma",
-  "modern masters 2015":"mm2",
-  "eternal masters":"ema",
-  "modern masters 2017":"mm3",
-  "renaissance":"ren",
-  "rinascimento":"rin",
-  "iconic masters":"ima",
-  "masters 25":"a25",
-  "ultimate masters":"uma",
-  "modern horizons":"mh1",
-  "modern horizons 2":"mh2",
-  "double masters":"2xm",
-  "jumpstart":"jmp",
-  "mystery booster":"mb1",
-  "modern horizons":"mh1",
-  "innistrad remastered":"inr",
-  "mystery booster 2":"mb2",
-  "jumpstart 2025":"j25",
-  "pioneer masters":"pio",
-  "ff through the ages":"fca",
-
-  // *** Beginner / Duel / Promo / Digital Sets ***
-  "portal":"por",
-  "portal 2":"p02",
-  "portal three kingdoms":"ptk",
-  "starter 1999":"s99",
-  "starter 2000":"s00",
-  "welcome deck 2016":"w16",
-  "welcome deck 2017":"w17",
-
-  "elves v goblins":"evg",
-  "jace v chandra":"dd2",
-  "universes beyond: assassin's creed":"acr",
-  "modern horizons 3":"mh3",
-  "the lord of the rings: tales of middle-earth":"ltr",
-
-
-  // …atd. (můžeš rozšířit s dalšími dle potřeby)
+const STORAGE_KEYS = {
+  entries: "mtg.boosterTracker.entries.v2",
+  game: "mtg.boosterTracker.game.v2",
+  achievements: "mtg.boosterTracker.achievements.v2",
+  lang: "mtg.boosterTracker.lang.v2"
 };
 
-  // seznam všech typů boosterů
-const boosterTypes = ["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"];
+const TYPE_META = {
+  PLAY: { color: "#72c885", labels: { cs: "PLAY", en: "PLAY" } },
+  SET: { color: "#f0b55b", labels: { cs: "SET", en: "SET" } },
+  DRAFT: { color: "#63a8ff", labels: { cs: "DRAFT", en: "DRAFT" } },
+  COLLECTOR: { color: "#c58bff", labels: { cs: "COLLECTOR", en: "COLLECTOR" } },
+  PROMO: { color: "#53d7b0", labels: { cs: "PROMO", en: "PROMO" } },
+  JUMPSTART: { color: "#ef7bbb", labels: { cs: "JUMPSTART", en: "JUMPSTART" } },
+  BEYOND: { color: "#9ccb55", labels: { cs: "BEYOND", en: "BEYOND" } },
+  PRERELEASEPROMO: { color: "#e9d5ff", labels: { cs: "PRERELEASE", en: "PRERELEASE" } },
+  THEME: { color: "#d563df", labels: { cs: "THEME", en: "THEME" } }
+};
 
-// uložení do localStorage
-function saveTable() {
-  const tableData = [];
-  document.querySelectorAll("#table tbody tr").forEach(row => {
-    const rowData = {
-      name: row.querySelector(".card-name").innerText,
-      edition: row.querySelector(".card-edition").innerText,
-      boosters: []
-    };
-    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
-      if(cb.checked) rowData.boosters.push(cb.value);
-    });
-    tableData.push(rowData);
+const BOOSTER_TYPES = Object.keys(TYPE_META);
+
+const BOOSTER_PROFILES = {
+  PLAY: { mythicRate: 0.125, foilRate: 0.22, specialRate: 0.08 },
+  SET: { mythicRate: 0.14, foilRate: 0.28, specialRate: 0.12 },
+  DRAFT: { mythicRate: 0.125, foilRate: 0.16, specialRate: 0.05 },
+  COLLECTOR: { mythicRate: 0.3, foilRate: 0.94, specialRate: 0.35 },
+  PROMO: { mythicRate: 0.18, foilRate: 0.72, specialRate: 0.22 },
+  JUMPSTART: { mythicRate: 0.1, foilRate: 0.08, specialRate: 0.04 },
+  BEYOND: { mythicRate: 0.15, foilRate: 0.24, specialRate: 0.11 },
+  PRERELEASEPROMO: { mythicRate: 0.2, foilRate: 0.85, specialRate: 0.2 },
+  THEME: { mythicRate: 0.08, foilRate: 0.08, specialRate: 0.03 }
+};
+
+const SPECIAL_HITS = ["Showcase", "Borderless", "Extended Art", "Textured"];
+
+const ACHIEVEMENTS = [
+  {
+    id: "first-entry",
+    test: (summary) => summary.entries.length >= 1,
+    labels: { cs: "PrvnĂ­ zĂˇpis", en: "First Entry" }
+  },
+  {
+    id: "five-sets",
+    test: (summary) => summary.uniqueSetCount >= 5,
+    labels: { cs: "SbĂ­rka roste", en: "Growing Collection" }
+  },
+  {
+    id: "box-hoarder",
+    test: (summary) => summary.totalBoxes >= 3,
+    labels: { cs: "Box hoarder", en: "Box hoarder" }
+  },
+  {
+    id: "first-booster",
+    test: (_, game) => game.boosters >= 1,
+    labels: { cs: "PrvnĂ­ booster", en: "First Booster" }
+  },
+  {
+    id: "mythic-hunter",
+    test: (_, game) => game.mythics >= 3,
+    labels: { cs: "Lovec mythicĹŻ", en: "Mythic Hunter" }
+  },
+  {
+    id: "booster-addict",
+    test: (_, game) => game.boosters >= 25,
+    labels: { cs: "Booster nadĹˇenec", en: "Booster Enthusiast" }
+  }
+];
+
+const COPY = {
+  cs: {
+    title: "MTG Booster Tracker",
+    eyebrow: "Centrum sbĂ­rky",
+    heroText: "PĹ™ehlednÄ›jĹˇĂ­ a stylovÄ›jĹˇĂ­ tracker pro otevĂ­rĂˇnĂ­ boosterĹŻ. PĹ™idĂˇvej edice, drĹľ statistiky pod kontrolou a mÄ›j vĹˇechno uloĹľenĂ© lokĂˇlnÄ› v prohlĂ­ĹľeÄŤi.",
+    heroKicker: "KaĹľdĂ˝ zĂˇpis se uklĂˇdĂˇ automaticky. MĹŻĹľeĹˇ si exportovat JSON nebo CSV a kdykoli se vrĂˇtit tam, kde jsi skonÄŤil.",
+    storageSaved: "Automaticky uloĹľeno do tohoto zaĹ™Ă­zenĂ­",
+    statTotalBoosters: "Boostery celkem",
+    statTrackedSets: "SledovanĂ© zĂˇznamy",
+    statBoxes: "Boxy",
+    statTopType: "NejÄŤastÄ›jĹˇĂ­ typ",
+    statLuck: "MĂ­ra ĹˇtÄ›stĂ­",
+    addEntryTitle: "PĹ™idat zĂˇznam",
+    addEntryText: "Jedna poloĹľka = jedna edice + jeden typ boosteru. Pokud stejnou kombinaci pĹ™idĂˇĹˇ znovu, poÄŤet se chytĹ™e navĂ˝ĹˇĂ­.",
+    fieldSetName: "NĂˇzev edice",
+    fieldCount: "PoÄŤet boosterĹŻ",
+    fieldBoxes: "PoÄŤet boxĹŻ",
+    fieldSetPlaceholder: "NapĹ™. Final Fantasy",
+    typeTitle: "Typ boosteru",
+    typeText: "Vyber, do kterĂ© kategorie tento zĂˇznam patĹ™Ă­.",
+    addButton: "PĹ™idat do trackeru",
+    clearFormButton: "VyÄŤistit formulĂˇĹ™",
+    toolsTitle: "NĂˇstroje a hra",
+    toolsText: "Exporty pro poĹ™Ăˇdek, import pro nĂˇvrat a mini simulĂˇtor pro radost navĂ­c.",
+    exportsTitle: "Import / export",
+    exportsText: "CSV se hodĂ­ na tabulky, JSON na zĂˇlohu kompletnĂ­ho stavu.",
+    exportCsvButton: "Export CSV",
+    exportJsonButton: "Export JSON",
+    importJsonButton: "Import JSON",
+    simTitle: "Booster simulĂˇtor",
+    simText: "OtevĹ™i booster, sleduj mythic rate a sbĂ­rej achievementy.",
+    simHistoryTitle: "PoslednĂ­ pully",
+    openBoosterButton: "OtevĹ™Ă­t booster",
+    mysteryButton: "TajemnĂ˝ event",
+    clearDataButton: "Smazat vĹˇechna data",
+    collectionTitle: "Tvoje kolekce",
+    searchLabel: "VyhledĂˇvĂˇnĂ­",
+    searchPlaceholder: "Hledat podle edice nebo typu",
+    sortLabel: "ĹazenĂ­",
+    sortNewest: "NejnovÄ›jĹˇĂ­",
+    sortOldest: "NejstarĹˇĂ­",
+    sortCountDesc: "NejvĂ­c boosterĹŻ",
+    sortAlphabetic: "AbecednÄ›",
+    headerSet: "Edice",
+    headerCount: "PoÄŤet",
+    headerBoxes: "Boxy",
+    headerType: "Typ",
+    headerActions: "Akce",
+    emptyState: "ZatĂ­m tu nic nenĂ­. PĹ™idej prvnĂ­ zĂˇznam a tracker oĹľije.",
+    analyticsTitle: "RozloĹľenĂ­ sbĂ­rky",
+    analyticsText: "Kolik boosterĹŻ padĂˇ do jednotlivĂ˝ch kategoriĂ­ a co teÄŹ sbĂ­rku tĂˇhne nejvĂ­c.",
+    chartEmpty: "Jakmile pĹ™idĂˇĹˇ prvnĂ­ zĂˇznam, objevĂ­ se tu rozdÄ›lenĂ­ podle typĹŻ.",
+    removeEntry: "Smazat poloĹľku",
+    removeConfirm: "Opravdu chceĹˇ smazat tento zĂˇznam?",
+    clearConfirm: "Opravdu chceĹˇ smazat vĹˇechna uloĹľenĂˇ data?",
+    toastAdded: "ZĂˇznam pĹ™idĂˇn do trackeru.",
+    toastRemoved: "ZĂˇznam smazĂˇn.",
+    toastCleared: "VĹˇechna data byla smazĂˇna.",
+    toastImported: "Import probÄ›hl v poĹ™Ăˇdku.",
+    toastExported: "Soubor je pĹ™ipraven ke staĹľenĂ­.",
+    toastAchievement: "NovĂ˝ achievement odemÄŤen.",
+    toastSelectType: "NejdĹ™Ă­v vyber typ boosteru.",
+    toastSetName: "DoplĹ prosĂ­m nĂˇzev edice.",
+    toastImportError: "Import se nepodaĹ™il. Zkus jinĂ˝ soubor JSON.",
+    toastLegacyImport: "NaÄŤetl jsem i starĹˇĂ­ formĂˇt dat.",
+    summary: "{entries} zĂˇznamĹŻ, {unique} unikĂˇtnĂ­ch edic, {boosters} boosterĹŻ celkem.",
+    typeShare: "{count} boosterĹŻ â€˘ {share}%",
+    topTypeMeta: "{count} boosterĹŻ v tĂ©to kategorii",
+    totalBoostersMeta: "Ve vĹˇech zĂˇznamech dohromady",
+    trackedSetsMeta: "{unique} unikĂˇtnĂ­ch nĂˇzvĹŻ edic",
+    boxesMeta: "CelkovĂ˝ poÄŤet zapsanĂ˝ch boxĹŻ",
+    luckHot: "Ĺ˝havĂ© tahy",
+    luckGood: "SolidnĂ­ run",
+    luckNormal: "NormĂˇlnĂ­ ĹˇtÄ›stĂ­",
+    luckCold: "Trochu smĹŻla",
+    luckMeta: "{mythics} mythicĹŻ z {boosters} otevĹ™enĂ˝ch boosterĹŻ",
+    noLuckMeta: "Booster simulĂˇtor jeĹˇtÄ› nemĂˇ data",
+    simIntro: "SimulĂˇtor ÄŤekĂˇ na prvnĂ­ booster. Mythic rate poÄŤĂ­tĂˇm jen z otevĹ™enĂ˝ch boosterĹŻ tady na strĂˇnce.",
+    simContextReadyLead: "AktivnĂ­ otevĹ™enĂ­ pouĹľije",
+    simContextReadyTail: "Po otevĹ™enĂ­ se boostery automaticky pĹ™ipĂ­Ĺˇou do trackeru a novĂˇ edice se zaloĹľĂ­ sama.",
+    simContextMissing: "VyplĹ nahoĹ™e nĂˇzev edice a vyber typ. Pak bude otevĹ™enĂ­ rovnou zapisovat i novĂ© edice do trackeru.",
+    simHistoryEmpty: "ZatĂ­m ĹľĂˇdnĂˇ historie otevĹ™enĂ­.",
+    simSummary: "{opened} pro {set} ({type}) â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simSummaryNoSet: "{opened} v typu {type} â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simAutoCreated: "NovĂˇ edice byla zaloĹľena automaticky.",
+    simAutoUpdated: "Edice v trackeru byla automaticky navĂ˝Ĺˇena.",
+    simAutoSkipped: "Bez nĂˇzvu edice tohle otevĹ™enĂ­ zĹŻstalo jen v simulĂˇtoru.",
+    simFoilLabel: "foil",
+    simSpecialLabel: "special",
+    simUnknownSet: "NeznĂˇmĂˇ edice",
+    simOpened: "Booster #{boosters}: {rarity}{foil}",
+    simFoilSuffix: " + FOIL",
+    rarityMythic: "MYTHIC",
+    rarityRare: "Rare",
+    mysteryBlackLotus: "Narazil jsi na vibe Black Lotus dne.",
+    mysteryTrashRare: "Dneska to spĂ­Ĺˇ chutnĂˇ po bulk rare.",
+    mysteryDoubleMythic: "V hlavÄ› sis otevĹ™el double mythic booster.",
+    mysteryFoil: "VĹˇechno kolem tebe se na chvĂ­li tvĂˇĹ™Ă­ foilovÄ›.",
+    mysteryHiddenBox: "NÄ›kde v polici se urÄŤitÄ› schovĂˇvĂˇ dalĹˇĂ­ box.",
+    countShort: "PoÄŤet",
+    boxesShort: "Boxy",
+    typeShort: "Typ",
+    addedOn: "PĹ™idĂˇno",
+    noTopType: "ZatĂ­m ĹľĂˇdnĂ˝",
+    fallbackDate: "Dnes",
+    csvName: "mtg_booster_tracker.csv",
+    jsonName: "mtg_booster_tracker.json"
+  },
+  en: {
+    title: "MTG Booster Tracker",
+    eyebrow: "Collection command center",
+    heroText: "A cleaner, sharper booster tracker for your MTG collection. Add sets, watch your stats and keep everything saved locally in your browser.",
+    heroKicker: "Every change is saved automatically. Export JSON or CSV whenever you want a backup or a spreadsheet-friendly copy.",
+    storageSaved: "Saved automatically on this device",
+    statTotalBoosters: "Total boosters",
+    statTrackedSets: "Tracked entries",
+    statBoxes: "Boxes",
+    statTopType: "Top category",
+    statLuck: "Luck meter",
+    addEntryTitle: "Add an entry",
+    addEntryText: "One row = one set + one booster type. Add the same combination again and the totals will stack neatly.",
+    fieldSetName: "Set name",
+    fieldCount: "Booster count",
+    fieldBoxes: "Box count",
+    fieldSetPlaceholder: "For example: Final Fantasy",
+    typeTitle: "Booster type",
+    typeText: "Choose the category that best fits this entry.",
+    addButton: "Add to tracker",
+    clearFormButton: "Clear form",
+    toolsTitle: "Tools and fun",
+    toolsText: "Exports for order, imports for safety and a small simulator for extra flavor.",
+    exportsTitle: "Import / export",
+    exportsText: "CSV is handy for spreadsheets, JSON keeps a full backup of the tracker state.",
+    exportCsvButton: "Export CSV",
+    exportJsonButton: "Export JSON",
+    importJsonButton: "Import JSON",
+    simTitle: "Booster simulator",
+    simText: "Open a booster, track mythic rate and unlock a few tiny achievements.",
+    simHistoryTitle: "Recent pulls",
+    openBoosterButton: "Open booster",
+    mysteryButton: "Mystery event",
+    clearDataButton: "Clear all data",
+    collectionTitle: "Your collection",
+    searchLabel: "Search",
+    searchPlaceholder: "Search by set or type",
+    sortLabel: "Sort",
+    sortNewest: "Newest first",
+    sortOldest: "Oldest first",
+    sortCountDesc: "Most boosters",
+    sortAlphabetic: "Alphabetical",
+    headerSet: "Set",
+    headerCount: "Count",
+    headerBoxes: "Boxes",
+    headerType: "Type",
+    headerActions: "Actions",
+    emptyState: "Nothing here yet. Add your first entry and the tracker will come alive.",
+    analyticsTitle: "Collection breakdown",
+    analyticsText: "See which booster categories lead your collection right now.",
+    chartEmpty: "Add your first entry to unlock the category breakdown.",
+    removeEntry: "Remove entry",
+    removeConfirm: "Do you really want to remove this entry?",
+    clearConfirm: "Do you really want to clear all saved data?",
+    toastAdded: "Entry added to the tracker.",
+    toastRemoved: "Entry removed.",
+    toastCleared: "All saved data has been cleared.",
+    toastImported: "Import completed successfully.",
+    toastExported: "Your file is ready to download.",
+    toastAchievement: "New achievement unlocked.",
+    toastSelectType: "Pick a booster type first.",
+    toastSetName: "Please enter a set name.",
+    toastImportError: "Import failed. Try another JSON file.",
+    toastLegacyImport: "Legacy data format was imported too.",
+    summary: "{entries} entries, {unique} unique sets, {boosters} boosters total.",
+    typeShare: "{count} boosters â€˘ {share}%",
+    topTypeMeta: "{count} boosters in this category",
+    totalBoostersMeta: "Across all tracker entries",
+    trackedSetsMeta: "{unique} unique set names",
+    boxesMeta: "Total recorded boxes",
+    luckHot: "Hot streak",
+    luckGood: "Pretty lucky",
+    luckNormal: "Normal luck",
+    luckCold: "A little cursed",
+    luckMeta: "{mythics} mythics from {boosters} opened boosters",
+    noLuckMeta: "The booster simulator does not have data yet",
+    simIntro: "The simulator is waiting for its first booster. Mythic rate is calculated only from boosters opened on this page.",
+    simContextReadyLead: "Current opening target:",
+    simContextReadyTail: "Opened boosters will be added to the tracker automatically, and brand-new sets will be created for you.",
+    simContextMissing: "Enter a set name above and keep a booster type selected. Then every opening can create or update the set automatically.",
+    simHistoryEmpty: "No opening history yet.",
+    simSummary: "{opened} for {set} ({type}) â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simSummaryNoSet: "{opened} in {type} â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simAutoCreated: "A new set entry was created automatically.",
+    simAutoUpdated: "The existing tracker entry was increased automatically.",
+    simAutoSkipped: "Without a set name, this opening stayed in the simulator only.",
+    simFoilLabel: "foil",
+    simSpecialLabel: "special",
+    simUnknownSet: "Unknown set",
+    simOpened: "Booster #{boosters}: {rarity}{foil}",
+    simFoilSuffix: " + FOIL",
+    rarityMythic: "MYTHIC",
+    rarityRare: "Rare",
+    mysteryBlackLotus: "Today feels like a hidden Black Lotus kind of day.",
+    mysteryTrashRare: "This one tastes a bit like bulk rare energy.",
+    mysteryDoubleMythic: "In your mind, that was definitely a double mythic booster.",
+    mysteryFoil: "For a second, everything around you turned foil.",
+    mysteryHiddenBox: "There is probably one more hidden box somewhere on the shelf.",
+    countShort: "Count",
+    boxesShort: "Boxes",
+    typeShort: "Type",
+    addedOn: "Added",
+    noTopType: "No data yet",
+    fallbackDate: "Today",
+    csvName: "mtg_booster_tracker.csv",
+    jsonName: "mtg_booster_tracker.json"
+  }
+};
+
+const SET_ICONS = {
+  "alpha":"lea","beta":"leb","unlimited":"2ed","revised":"3ed","alpha online":"1e","beta online":"2e","unlimited online":"2u","revised online":"3e","fourth edition":"4ed","summer magic":"psum","fifth edition":"5ed","sixth edition":"6ed","seventh edition":"7ed","eighth edition":"8ed","ninth edition":"9ed","tenth edition":"10e","magic 2010":"m10","magic 2011":"m11","magic 2012":"m12","magic 2013":"m13","magic 2014":"m14","magic 2015":"m15","blank core set":"bcore","magic origins":"ori","magic 2019":"m19","magic 2020":"m20","core 2021":"m21","adventures in the forgotten realms":"afr","foundations":"fdn",
+  "arabian nights":"arn","antiquities":"atq","legends":"leg","the dark":"drk","fallen empires":"fem","homelands":"hml","ice age":"ice","ice age original":"ice2","alliances":"all","coldsnap":"csp","mirage":"mir","visions":"vis","weatherlight":"wth","tempest":"tmp","stronghold":"sth","exodus":"exo","urza's saga":"usg","urza's legacy":"ulg","urza's destiny":"uds","mercadian masques":"mmq","nemesis":"nem","prophecy":"pcy","invasion":"inv","planeshift":"pls","apocalypse":"apc","odyssey":"ody","torment":"tor","judgment":"jud","judgement":"jud","onslaught":"ons","legions":"lgn","scourge":"scg","mirrodin":"mrd","darksteel":"dst","fifth dawn":"5dn","champions of kamigawa":"chk","betrayers of kamigawa":"bok","saviors of kamigawa":"sok","ravnica":"rav","guildpact":"gpt","dissension":"dis","time spiral":"tsp","planar chaos":"plc","future sight":"fut","lorwyn":"lrw","morningtide":"mor","shadowmoor":"shm","eventide":"eve","shards of alara":"ala","conflux":"con","alara reborn":"arb","zendikar":"zen","worldwake":"wwk","rise of the eldrazi":"roe","scars of mirrodin":"som","mirrodin besieged":"mbs","new phyrexia":"nph","innistrad":"isd","dark ascension":"dka","avacyn restored":"avr","return to ravnica":"rtr","gatecrash":"gtc","dragon's maze":"dgm","theros":"ths","born of the gods":"bng","journey into nyx":"jou","khans of tarkir":"ktk","fate reforged":"frf","dragons of tarkir":"dtk","battle for zendikar":"bfz","oath of the gatewatch":"ogw","shadows over innistrad":"soi","eldritch moon":"emn","kaladesh":"kld","aether revolt":"aer","amonkhet":"akh","hour of devastation":"hou","ixalan":"xln","rivals of ixalan":"rix","dominaria":"dom","guilds of ravnica":"grn","ravnica allegiance":"rna","war of the spark":"war","throne of eldraine":"eld","theros beyond death":"thb","ikoria lair of behemoths":"iko","zendikar rising":"znr","kaldheim":"khm","strixhaven school of mages":"stx","innistrad midnight hunt":"mid","innistrad crimson vow":"vow","kamigawa neon dynasty":"neo","streets of new capenna":"snc","dominaria united":"dmu","the brothers' war":"bro","phyrexia all will be one":"one","march of the machine":"mom","march of the machine aftermath":"mat","wilds of eldraine":"woe","lost caverns of ixalan":"lci","murders at karlov manor":"mkm","outlaws of thunder junction":"otj","the big score":"big","bloomburrow":"blb","duskmourn house of horrors":"dsk","aetherdrift":"dft","tarkir dragonstorm":"tdm","final fantasy":"fin","edge of eternities":"eoe","marvel spider-man":"spm","avatar the last airbender":"tla","lorwyn eclipsed":"ecl","teenage mutant ninja turtles":"tmt",
+  "vanguard":"van","planechase":"hop","archenemy":"arc","commander":"cmd","planechase 2012":"pc2","commander's arsenal":"cm1","commander 2013":"c13","conspiracy":"cns","commander 2014":"c14","commander 2015":"c15","conspiracy 2 take the crown":"cn2","commander 2016":"c16","planechase anthology":"pca","commander anthology":"cma","archenemy nicol bolas":"e01","explorers of ixalan":"e02","commander 2017":"c17","commander anthology 2":"cm2","battlebond":"bbd","commander 2018":"c18","commander 2019":"c19","ikoria commander 2020":"c20","zendikar rising commander":"znc","commander collection green":"cc1","commander legends":"cmr","commander legends decks":"cmc","kaldheim commander":"khc","commander 2021":"c21","forgotten realms commander":"afc","midnight hunt commander":"mic","crimson vow commander":"voc","commander collection black":"cc2","kamigawa commander":"nec","streets of new capenna commander":"ncc","commander legends battle for baldur's gate":"clb","commander legends battle for baldurs gate":"clb","dominaria united commander":"dmc","warhammer 40k":"40k","the brothers war commander":"brc","phyrexia all will be one commander":"onc","march of the machine commander":"moc","starter commander decks":"scd","commander masters":"cmm","lord of the rings commander":"ltc","ub doctor who":"who","wilds of eldraine commander":"woc","lci commander":"lcc","ub fallout":"pip","mkm commander":"mkc","otj commander":"otc","bloomburrow commander":"blc",
+  "chronicles":"chr","anthologies":"ath","battle royale":"brb","beatdown":"btd","deckmasters":"dkm","modern masters":"mma","modern masters 2015":"mm2","eternal masters":"ema","modern masters 2017":"mm3","renaissance":"ren","rinascimento":"rin","iconic masters":"ima","masters 25":"a25","ultimate masters":"uma","modern horizons":"mh1","modern horizons 2":"mh2","double masters":"2xm","jumpstart":"jmp","mystery booster":"mb1","innistrad remastered":"inr","mystery booster 2":"mb2","jumpstart 2025":"j25","pioneer masters":"pio","ff through the ages":"fca","portal":"por","portal 2":"p02","portal three kingdoms":"ptk","starter 1999":"s99","starter 2000":"s00","welcome deck 2016":"w16","welcome deck 2017":"w17","elves v goblins":"evg","jace v chandra":"dd2","universes beyond: assassin's creed":"acr","modern horizons 3":"mh3","the lord of the rings: tales of middle-earth":"ltr"
+};
+
+const state = {
+  lang: loadJson(STORAGE_KEYS.lang, "cs"),
+  entries: normalizeEntries(loadJson(STORAGE_KEYS.entries, [])),
+  game: normalizeGame(loadJson(STORAGE_KEYS.game, {})),
+  achievements: normalizeAchievements(loadJson(STORAGE_KEYS.achievements, [])),
+  selectedType: "PLAY",
+  query: "",
+  sort: "newest"
+};
+
+const elements = {
+  pageTitle: document.getElementById("pageTitle"),
+  setName: document.getElementById("setName"),
+  count: document.getElementById("count"),
+  boxCount: document.getElementById("boxCount"),
+  typePicker: document.getElementById("typePicker"),
+  addButton: document.getElementById("addButton"),
+  clearFormButton: document.getElementById("clearFormButton"),
+  exportCsvButton: document.getElementById("exportCsvButton"),
+  exportJsonButton: document.getElementById("exportJsonButton"),
+  importJsonButton: document.getElementById("importJsonButton"),
+  openBoosterButton: document.getElementById("openBoosterButton"),
+  mysteryButton: document.getElementById("mysteryButton"),
+  clearDataButton: document.getElementById("clearDataButton"),
+  entryList: document.getElementById("entryList"),
+  emptyState: document.getElementById("emptyState"),
+  searchInput: document.getElementById("searchInput"),
+  sortSelect: document.getElementById("sortSelect"),
+  collectionSummary: document.getElementById("collectionSummary"),
+  breakdown: document.getElementById("breakdown"),
+  simOutput: document.getElementById("simOutput"),
+  simContext: document.getElementById("simContext"),
+  simHistoryList: document.getElementById("simHistoryList"),
+  achievementList: document.getElementById("achievementList"),
+  importInput: document.getElementById("importInput"),
+  toast: document.getElementById("toast"),
+  chartEmpty: document.getElementById("chartEmpty"),
+  setSuggestions: document.getElementById("setSuggestions"),
+  statTotalBoostersValue: document.getElementById("statTotalBoostersValue"),
+  statTotalBoostersMeta: document.getElementById("statTotalBoostersMeta"),
+  statTrackedSetsValue: document.getElementById("statTrackedSetsValue"),
+  statTrackedSetsMeta: document.getElementById("statTrackedSetsMeta"),
+  statBoxesValue: document.getElementById("statBoxesValue"),
+  statBoxesMeta: document.getElementById("statBoxesMeta"),
+  statTopTypeValue: document.getElementById("statTopTypeValue"),
+  statTopTypeMeta: document.getElementById("statTopTypeMeta"),
+  statLuckValue: document.getElementById("statLuckValue"),
+  statLuckMeta: document.getElementById("statLuckMeta")
+};
+
+let chart;
+let toastTimer;
+
+function loadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function normalizeEntries(input) {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  return input
+    .map((item) => normalizeEntry(item))
+    .filter(Boolean);
+}
+
+function normalizeEntry(item) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+  const name = String(item.name || "").trim();
+  const type = sanitizeType(item.type);
+  if (!name || !type) {
+    return null;
+  }
+  const count = clampNumber(item.count, 1, 99999, 1);
+  const boxCount = clampNumber(item.boxCount, 0, 99999, 0);
+  return {
+    id: String(item.id || createId()),
+    name,
+    count,
+    boxCount,
+    type,
+    keyrune: item.keyrune || SET_ICONS[name.toLowerCase()] || "",
+    createdAt: Number.isFinite(item.createdAt) ? item.createdAt : Date.now()
+  };
+}
+
+function normalizeGame(input) {
+  const game = input && typeof input === "object" ? input : {};
+  return {
+    boosters: clampNumber(game.boosters, 0, 999999, 0),
+    mythics: clampNumber(game.mythics, 0, 999999, 0),
+    rares: clampNumber(game.rares, 0, 999999, 0),
+    foils: clampNumber(game.foils, 0, 999999, 0),
+    lastLog: String(game.lastLog || ""),
+    history: Array.isArray(game.history)
+      ? game.history.map((item) => normalizePull(item)).filter(Boolean).slice(0, 10)
+      : []
+  };
+}
+
+function normalizePull(item) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+  const type = sanitizeType(item.type);
+  const rarity = item.rarity === "MYTHIC" ? "MYTHIC" : item.rarity === "RARE" ? "RARE" : "";
+  if (!type || !rarity) {
+    return null;
+  }
+  return {
+    setName: String(item.setName || ""),
+    type,
+    rarity,
+    foil: Boolean(item.foil),
+    special: String(item.special || ""),
+    at: Number.isFinite(item.at) ? item.at : Date.now()
+  };
+}
+
+function normalizeAchievements(input) {
+  const ids = Array.isArray(input) ? input.map(String) : [];
+  return ids.filter((id) => ACHIEVEMENTS.some((achievement) => achievement.id === id));
+}
+
+function clampNumber(value, min, max, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function sanitizeType(value) {
+  const next = String(value || "").toUpperCase();
+  return BOOSTER_TYPES.includes(next) ? next : "";
+}
+
+function createId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+  return `entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function copy(key, replacements) {
+  const dictionary = COPY[state.lang] || COPY.cs;
+  let text = dictionary[key] || COPY.cs[key] || key;
+  if (!replacements) {
+    return text;
+  }
+  Object.entries(replacements).forEach(([token, value]) => {
+    text = text.replaceAll(`{${token}}`, value);
   });
-  localStorage.setItem("mtgTableData", JSON.stringify(tableData));
+  return text;
 }
 
-// načtení z localStorage
-async function save(){
- localStorage.setItem("mtgSets",JSON.stringify(sets))
- await setDoc(doc(db,"mtg","sets"),{data:sets})
+function saveState() {
+  localStorage.setItem(STORAGE_KEYS.entries, JSON.stringify(state.entries));
+  localStorage.setItem(STORAGE_KEYS.game, JSON.stringify(state.game));
+  localStorage.setItem(STORAGE_KEYS.achievements, JSON.stringify(state.achievements));
+  localStorage.setItem(STORAGE_KEYS.lang, JSON.stringify(state.lang));
 }
 
-// počítání boosterů
-function countBoosters() {
-  const counts = {};
-  boosterTypes.forEach(type => counts[type] = 0);
-  document.querySelectorAll("#table tbody tr").forEach(row => {
-    row.querySelectorAll("input[type=checkbox]").forEach(cb => {
-      if(cb.checked) counts[cb.value]++;
-    });
+function render() {
+  renderStaticCopy();
+  renderTypePicker();
+  renderSuggestions();
+  renderSortSelect();
+  renderSummary();
+  renderEntries();
+  renderStats();
+  renderSimulator();
+  renderAchievements();
+  renderAnalytics();
+  syncLanguageButtons();
+}
+
+function renderStaticCopy() {
+  document.documentElement.lang = state.lang === "en" ? "en" : "cs";
+  document.title = copy("title");
+  elements.pageTitle.textContent = copy("title");
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = copy(node.dataset.i18n);
   });
-  console.log("Počty boosterů:", counts);
+  elements.setName.placeholder = copy("fieldSetPlaceholder");
+  elements.searchInput.placeholder = copy("searchPlaceholder");
+  elements.addButton.textContent = copy("addButton");
+  elements.clearFormButton.textContent = copy("clearFormButton");
+  elements.exportCsvButton.textContent = copy("exportCsvButton");
+  elements.exportJsonButton.textContent = copy("exportJsonButton");
+  elements.importJsonButton.textContent = copy("importJsonButton");
+  elements.openBoosterButton.textContent = copy("openBoosterButton");
+  elements.mysteryButton.textContent = copy("mysteryButton");
+  elements.clearDataButton.textContent = copy("clearDataButton");
 }
 
-let sets = JSON.parse(localStorage.getItem("mtgSets")) || []
-
-function save(){ localStorage.setItem("mtgSets",JSON.stringify(sets)) }
-function createTags(types){ return types.map(t=>`<span class="tag ${t.toLowerCase()}">${t}</span>`).join("") }
-
-function render(){
-    let tbody=document.querySelector("#table tbody")
-    tbody.innerHTML=""
-    sets.forEach((s,i)=>{
-        let key = s.keyrune
-        let iconHTML = key? `<i class="ss ss-${key} icon"></i>` : ""
-        tbody.innerHTML+=`
-<tr>
-<td>${iconHTML}${s.name}</td>
-<td>${s.count}</td>
-<td>${s.boxCount}</td>
-<td>${createTags(s.types)}</td>
-<td><button class="deleteBtn" onclick="removeSet(${i})">X</button></td>
-</tr>
-`
-    })
-    updateStats()
-    updateChart()
+function syncLanguageButtons() {
+  document.querySelectorAll("[data-lang-btn]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.langBtn === state.lang);
+  });
 }
 
-function addSet(){
-    let name=document.getElementById("setName").value.trim()
-    if(!name) return
-    let key = editionKeyrune[name.toLowerCase()] || ""
-    let count=parseInt(document.getElementById("count").value)
-    let boxCount=parseInt(document.getElementById("boxCount").value)
-    let types=[]
-    document.querySelectorAll("input[type=checkbox]:checked").forEach(c=>{types.push(c.value); c.checked=false})
-    if(types.length==0) return
-    sets.push({name,keyrune:key,count,boxCount,types})
-    document.getElementById("setName").value=""
-    document.getElementById("count").value=1
-    document.getElementById("boxCount").value=0
-    save()
-    render()
+function renderTypePicker() {
+  elements.typePicker.innerHTML = BOOSTER_TYPES.map((type) => `
+    <div class="type-option" style="--type-color:${TYPE_META[type].color}">
+      <button type="button" data-type="${type}" class="${state.selectedType === type ? "active" : ""}">
+        <span class="type-swatch" aria-hidden="true"></span>
+        <span class="type-label">${escapeHtml(TYPE_META[type].labels[state.lang])}</span>
+      </button>
+    </div>
+  `).join("");
 }
 
-function removeSet(i){ sets.splice(i,1); save(); render() }
-
-function searchTable(){
-    let f=document.getElementById("search").value.toLowerCase()
-    document.querySelectorAll("#table tbody tr").forEach(r=>{
-        r.style.display=r.children[0].innerText.toLowerCase().includes(f)?"":"none"
-    })
+function renderSuggestions() {
+  const suggestionMap = new Map();
+  Object.keys(SET_ICONS).forEach((name) => {
+    suggestionMap.set(name.toLowerCase(), titleCase(name));
+  });
+  state.entries.forEach((entry) => {
+    suggestionMap.set(entry.name.toLowerCase(), entry.name);
+  });
+  const options = Array.from(suggestionMap.values())
+    .sort((a, b) => a.localeCompare(b))
+    .map((name) => `<option value="${escapeAttribute(name)}"></option>`);
+  elements.setSuggestions.innerHTML = options.join("");
 }
 
-function updateStats(){
-    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
-    let total=0
-
-    sets.forEach(s=>{
-        s.types.forEach(t=>{
-            stats[t]+=s.count
-            total+=s.count
-        })
-    })
-
-    let top = Object.entries(stats).sort((a,b)=>b[1]-a[1])[0]
-
-    document.getElementById("stats").innerText=
-        `Total boosters: ${total} | Top: ${top[0]} (${top[1]})`
+function renderSortSelect() {
+  const options = [
+    { value: "newest", label: copy("sortNewest") },
+    { value: "oldest", label: copy("sortOldest") },
+    { value: "count-desc", label: copy("sortCountDesc") },
+    { value: "alpha", label: copy("sortAlphabetic") }
+  ];
+  elements.sortSelect.innerHTML = options.map((option) => `
+    <option value="${option.value}" ${state.sort === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>
+  `).join("");
 }
 
-function updateChart(){
-    let stats={PLAY:0,SET:0,DRAFT:0,COLLECTOR:0,PROMO:0,JUMPSTART:0,BEYOND:0,PRERELEASEPROMO:0,THEME:0}
-    sets.forEach(s=>s.types.forEach(t=>{stats[t]+=s.count}))
-    let data=[stats.PLAY,stats.SET,stats.DRAFT,stats.COLLECTOR,stats.PROMO,stats.JUMPSTART,stats.BEYOND,stats.PRERELEASEPROMO,stats.THEME]
-    if(window.chart) chart.destroy()
-    window.chart=new Chart(document.getElementById("chart"),{
-        type:"pie",
-        data:{labels:["PLAY","SET","DRAFT","COLLECTOR","PROMO","JUMPSTART","BEYOND","PRERELEASEPROMO","THEME"],datasets:[{data:data,backgroundColor:["#4caf50","#ff9800","#2196f3","#9c27b0"]}]}
-    })
+function getSummary() {
+  const totals = BOOSTER_TYPES.reduce((accumulator, type) => {
+    accumulator[type] = 0;
+    return accumulator;
+  }, {});
+  let totalBoosters = 0;
+  let totalBoxes = 0;
+  state.entries.forEach((entry) => {
+    totals[entry.type] += entry.count;
+    totalBoosters += entry.count;
+    totalBoxes += entry.boxCount;
+  });
+  const uniqueSetCount = new Set(state.entries.map((entry) => entry.name.toLowerCase())).size;
+  const topTypeRecord = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+  return {
+    entries: state.entries,
+    totals,
+    totalBoosters,
+    totalBoxes,
+    uniqueSetCount,
+    topType: topTypeRecord && topTypeRecord[1] > 0 ? topTypeRecord[0] : "",
+    topTypeCount: topTypeRecord ? topTypeRecord[1] : 0
+  };
 }
 
-function exportCSV(){
-    let csv="Edice,Pocet,Boxy,Typy\n"
-    sets.forEach(s=>{csv+=`${s.name},${s.count},${s.boxCount},"${s.types.join(" ")}"\n`})
-    let blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a")
-    a.href=url;a.download="mtg_boostery.csv";a.click()
+function renderSummary() {
+  const summary = getSummary();
+  elements.collectionSummary.textContent = state.lang === "cs"
+    ? `${summary.entries.length} ${pluralizeCs(summary.entries.length, "zĂˇznam", "zĂˇznamy", "zĂˇznamĹŻ")}, ${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikĂˇtnĂ­ edice", "unikĂˇtnĂ­ edice", "unikĂˇtnĂ­ch edic")}, ${summary.totalBoosters} ${pluralizeCs(summary.totalBoosters, "booster", "boostery", "boosterĹŻ")} celkem.`
+    : copy("summary", {
+        entries: String(summary.entries.length),
+        unique: String(summary.uniqueSetCount),
+        boosters: String(summary.totalBoosters)
+      });
 }
 
-function exportJSON(){
-    let blob=new Blob([JSON.stringify(sets,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a")
-    a.href=url;a.download="mtg_boostery.json";a.click()
-}
-
-function importJSON(){
-    let input=document.createElement("input")
-    input.type="file"; input.accept=".json"
-    input.onchange=e=>{
-        let file=e.target.files[0]; if(!file) return
-        let reader=new FileReader()
-        reader.onload=ev=>{ sets=JSON.parse(ev.target.result); save(); render() }
-        reader.readAsText(file)
+function getFilteredEntries() {
+  const query = state.query.trim().toLowerCase();
+  const filtered = state.entries.filter((entry) => {
+    if (!query) {
+      return true;
     }
-    input.click()
+    return entry.name.toLowerCase().includes(query) || entry.type.toLowerCase().includes(query);
+  });
+  switch (state.sort) {
+    case "oldest":
+      return filtered.sort((a, b) => a.createdAt - b.createdAt);
+    case "count-desc":
+      return filtered.sort((a, b) => b.count - a.count || b.boxCount - a.boxCount || b.createdAt - a.createdAt);
+    case "alpha":
+      return filtered.sort((a, b) => a.name.localeCompare(b.name));
+    case "newest":
+    default:
+      return filtered.sort((a, b) => b.createdAt - a.createdAt);
+  }
 }
 
-function setLang(lang){
-    if(lang=="cz"){
-        title.innerText="ULTIMATE MTG Správce boosterů"
-        addBtn.innerText="Přidat"
-        search.placeholder="Vyhledat edici..."
-        colSet.innerText="Edice"
-        colCount.innerText="Počet"
-        colBox.innerText="Boxy"
-        colType.innerText="Typ"
-        colAction.innerText="Akce"
+function renderEntries() {
+  const filteredEntries = getFilteredEntries();
+  elements.entryList.innerHTML = filteredEntries.map((entry) => renderEntryRow(entry)).join("");
+  elements.emptyState.classList.toggle("visible", filteredEntries.length === 0);
+}
+
+function renderEntryRow(entry) {
+  const typeMeta = TYPE_META[entry.type];
+  const icon = entry.keyrune
+    ? `<span class="set-icon"><i class="ss ss-${escapeAttribute(entry.keyrune)}" aria-hidden="true"></i></span>`
+    : `<span class="set-icon set-icon-fallback">${escapeHtml(entry.name.charAt(0).toUpperCase())}</span>`;
+  const mobileMeta = `
+    <div class="entry-meta-grid">
+      <div class="entry-meta-cell">
+        <span class="entry-meta-label">${escapeHtml(copy("countShort"))}</span>
+        <span class="entry-value">${entry.count}</span>
+      </div>
+      <div class="entry-meta-cell">
+        <span class="entry-meta-label">${escapeHtml(copy("boxesShort"))}</span>
+        <span class="entry-value">${entry.boxCount}</span>
+      </div>
+      <div class="entry-meta-cell">
+        <span class="entry-meta-label">${escapeHtml(copy("typeShort"))}</span>
+        <span class="type-badge" style="--type-color:${typeMeta.color}">
+          <span class="type-swatch" aria-hidden="true"></span>
+          ${escapeHtml(typeMeta.labels[state.lang])}
+        </span>
+      </div>
+    </div>
+  `;
+
+  return `
+    <article class="entry-row">
+      <div class="set-main">
+        ${icon}
+        <div class="set-copy">
+          <p class="set-name">${escapeHtml(entry.name)}</p>
+          <div class="set-date">${escapeHtml(copy("addedOn"))}: ${escapeHtml(formatDate(entry.createdAt))}</div>
+        </div>
+      </div>
+      <div class="entry-value desktop-value">${entry.count}</div>
+      <div class="entry-value desktop-value">${entry.boxCount}</div>
+      <div class="desktop-value">
+        <span class="type-badge" style="--type-color:${typeMeta.color}">
+          <span class="type-swatch" aria-hidden="true"></span>
+          ${escapeHtml(typeMeta.labels[state.lang])}
+        </span>
+      </div>
+      <div class="entry-actions">
+        <button type="button" data-remove-id="${escapeAttribute(entry.id)}" aria-label="${escapeAttribute(copy("removeEntry"))}">Ă—</button>
+      </div>
+      ${mobileMeta}
+    </article>
+  `;
+}
+
+function renderStats() {
+  const summary = getSummary();
+  const topType = summary.topType ? TYPE_META[summary.topType].labels[state.lang] : copy("noTopType");
+  elements.statTotalBoostersValue.textContent = String(summary.totalBoosters);
+  elements.statTotalBoostersMeta.textContent = copy("totalBoostersMeta");
+  elements.statTrackedSetsValue.textContent = String(summary.entries.length);
+  elements.statTrackedSetsMeta.textContent = state.lang === "cs"
+    ? `${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikĂˇtnĂ­ nĂˇzev edice", "unikĂˇtnĂ­ nĂˇzvy edic", "unikĂˇtnĂ­ch nĂˇzvĹŻ edic")}`
+    : copy("trackedSetsMeta", { unique: String(summary.uniqueSetCount) });
+  elements.statBoxesValue.textContent = String(summary.totalBoxes);
+  elements.statBoxesMeta.textContent = copy("boxesMeta");
+  elements.statTopTypeValue.textContent = topType;
+  elements.statTopTypeMeta.textContent = summary.topType
+    ? (state.lang === "cs"
+        ? `${summary.topTypeCount} ${pluralizeCs(summary.topTypeCount, "booster", "boostery", "boosterĹŻ")} v tĂ©to kategorii`
+        : copy("topTypeMeta", { count: String(summary.topTypeCount) }))
+    : copy("chartEmpty");
+
+  const boosters = state.game.boosters;
+  const mythicRate = boosters > 0 ? state.game.mythics / boosters : 0;
+  let luckLabel = copy("noTopType");
+  if (boosters > 0) {
+    if (mythicRate >= 0.2) {
+      luckLabel = copy("luckHot");
+    } else if (mythicRate >= 0.12) {
+      luckLabel = copy("luckGood");
+    } else if (mythicRate < 0.05) {
+      luckLabel = copy("luckCold");
+    } else {
+      luckLabel = copy("luckNormal");
     }
-    if(lang=="en"){
-        title.innerText="ULTIMATE MTG Booster Tracker"
-        addBtn.innerText="Add"
-        search.placeholder="Search set..."
-        colSet.innerText="Set"
-        colCount.innerText="Count"
-        colBox.innerText="Boxes"
-        colType.innerText="Type"
-        colAction.innerText="Action"
+  }
+  elements.statLuckValue.textContent = luckLabel;
+  elements.statLuckMeta.textContent = boosters > 0
+    ? copy("luckMeta", { mythics: String(state.game.mythics), boosters: String(boosters) })
+    : copy("noLuckMeta");
+}
+
+function renderSimulator() {
+  const currentSet = elements.setName.value.trim();
+  const currentCount = clampNumber(elements.count.value, 1, 36, 1);
+  const currentTypeLabel = TYPE_META[state.selectedType].labels[state.lang];
+  elements.simContext.innerHTML = currentSet
+    ? `${escapeHtml(copy("simContextReadyLead"))} <strong>${escapeHtml(currentSet)}</strong> â€˘ ${escapeHtml(currentTypeLabel)} â€˘ x${currentCount}. ${escapeHtml(copy("simContextReadyTail"))}`
+    : escapeHtml(copy("simContextMissing"));
+  elements.simOutput.textContent = state.game.lastLog || copy("simIntro");
+  if (!state.game.history.length) {
+    elements.simHistoryList.innerHTML = `<div class="sim-history-item">${escapeHtml(copy("simHistoryEmpty"))}</div>`;
+    return;
+  }
+  elements.simHistoryList.innerHTML = state.game.history.map((pull) => renderPullHistoryItem(pull)).join("");
+}
+
+function renderPullHistoryItem(pull) {
+  const tags = [pull.rarity === "MYTHIC" ? copy("rarityMythic") : copy("rarityRare")];
+  if (pull.foil) {
+    tags.push(copy("simFoilLabel"));
+  }
+  if (pull.special) {
+    tags.push(`${copy("simSpecialLabel")}: ${pull.special}`);
+  }
+  return `
+    <div class="sim-history-item">
+      <strong>${escapeHtml(pull.setName || copy("simUnknownSet"))}</strong>
+      <span class="sim-history-meta">${escapeHtml(TYPE_META[pull.type].labels[state.lang])} â€˘ ${escapeHtml(tags.join(" â€˘ "))}</span>
+    </div>
+  `;
+}
+
+function renderAchievements() {
+  elements.achievementList.innerHTML = state.achievements.map((id) => {
+    const achievement = ACHIEVEMENTS.find((item) => item.id === id);
+    if (!achievement) {
+      return "";
     }
-}
-let statsGame = JSON.parse(localStorage.getItem("mtgGame")) || {
-  boosters:0,
-  mythics:0,
-  rares:0,
-  foils:0
+    return `<span class="achievement-pill">âś¦ ${escapeHtml(achievement.labels[state.lang])}</span>`;
+  }).join("");
 }
 
-function saveGame(){
-  localStorage.setItem("mtgGame", JSON.stringify(statsGame))
+function renderAnalytics() {
+  const summary = getSummary();
+  const labels = BOOSTER_TYPES.map((type) => TYPE_META[type].labels[state.lang]);
+  const data = BOOSTER_TYPES.map((type) => summary.totals[type]);
+  const colors = BOOSTER_TYPES.map((type) => TYPE_META[type].color);
+  const total = summary.totalBoosters;
+
+  elements.breakdown.innerHTML = BOOSTER_TYPES.map((type) => {
+    const count = summary.totals[type];
+    const share = total > 0 ? Math.round((count / total) * 100) : 0;
+    return `
+      <article class="breakdown-card" style="--type-color:${TYPE_META[type].color}">
+        <div class="breakdown-top">
+          <div class="breakdown-label">
+            <span class="type-swatch" aria-hidden="true"></span>
+            <span>${escapeHtml(TYPE_META[type].labels[state.lang])}</span>
+          </div>
+          <strong>${count}</strong>
+        </div>
+        <div class="set-date">${escapeHtml(copy("typeShare", { count: String(count), share: String(share) }))}</div>
+        <div class="breakdown-bar"><span style="width:${share}%"></span></div>
+      </article>
+    `;
+  }).join("");
+
+  elements.chartEmpty.classList.toggle("visible", total === 0);
+  if (chart) {
+    chart.destroy();
+  }
+  chart = new Chart(document.getElementById("chart"), {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: "rgba(11,20,16,0.92)",
+          borderColor: "rgba(255,255,255,0.08)",
+          borderWidth: 1,
+          titleColor: "#f4f1e5",
+          bodyColor: "#f4f1e5",
+          padding: 12,
+          callbacks: {
+            label(context) {
+              const count = context.raw;
+              const share = total > 0 ? Math.round((count / total) * 100) : 0;
+              return `${context.label}: ${count} (${share}%)`;
+            }
+          }
+        }
+      },
+      cutout: "66%"
+    }
+  });
 }
 
-function openBooster(){
-  statsGame.boosters++
+function upsertEntry({ name, type, count, boxCount, createdAt }) {
+  const normalizedName = String(name || "").trim();
+  if (!normalizedName) {
+    return null;
+  }
+  const safeType = sanitizeType(type);
+  if (!safeType) {
+    return null;
+  }
+  const nextCount = clampNumber(count, 1, 99999, 1);
+  const nextBoxCount = clampNumber(boxCount, 0, 99999, 0);
+  const timestamp = Number.isFinite(createdAt) ? createdAt : Date.now();
+  const existing = state.entries.find((entry) => entry.name.toLowerCase() === normalizedName.toLowerCase() && entry.type === safeType);
+  if (existing) {
+    existing.count += nextCount;
+    existing.boxCount += nextBoxCount;
+    existing.createdAt = timestamp;
+    return { mode: "updated", entry: existing };
+  }
+  const entry = {
+    id: createId(),
+    name: normalizedName,
+    count: nextCount,
+    boxCount: nextBoxCount,
+    type: safeType,
+    keyrune: SET_ICONS[normalizedName.toLowerCase()] || "",
+    createdAt: timestamp
+  };
+  state.entries.push(entry);
+  return { mode: "created", entry };
+}
 
-  let isMythic = Math.random() < 0.125
-  let isFoil = Math.random() < 0.2
+function rollBooster(type) {
+  const profile = BOOSTER_PROFILES[type] || BOOSTER_PROFILES.PLAY;
+  return {
+    type,
+    rarity: Math.random() < profile.mythicRate ? "MYTHIC" : "RARE",
+    foil: Math.random() < profile.foilRate,
+    special: Math.random() < profile.specialRate
+      ? SPECIAL_HITS[Math.floor(Math.random() * SPECIAL_HITS.length)]
+      : ""
+  };
+}
 
-  let result = isMythic ? "💎 MYTHIC!" : "🟡 Rare"
-  
-  if(isMythic) statsGame.mythics++
-  else statsGame.rares++
+function getOpenedPhrase(count) {
+  if (state.lang === "cs") {
+    return count === 1
+      ? "Otevren 1 booster"
+      : `Otevreno ${count} ${pluralizeCs(count, "booster", "boostery", "boosteru")}`;
+  }
+  return count === 1 ? "Opened 1 booster" : `Opened ${count} boosters`;
+}
 
+function buildBoosterSummary({ setName, type, count, mythics, rares, foils, specials, trackerResult }) {
+  const summaryKey = setName ? "simSummary" : "simSummaryNoSet";
+  const base = copy(summaryKey, {
+    opened: getOpenedPhrase(count),
+    set: setName,
+    type: TYPE_META[type].labels[state.lang],
+    mythics: String(mythics),
+    rares: String(rares),
+    foils: String(foils),
+    specials: String(specials)
+  });
+  if (!setName) {
+    return `${base} ${copy("simAutoSkipped")}`;
+  }
+  return `${base} ${copy(trackerResult && trackerResult.mode === "created" ? "simAutoCreated" : "simAutoUpdated")}`;
+}
 
-  if(isFoil){
-    statsGame.foils++
-    result += " + ✨ FOIL"
+function addEntry() {
+  const name = elements.setName.value.trim();
+  if (!name) {
+    showToast(copy("toastSetName"));
+    elements.setName.focus();
+    return;
+  }
+  if (!state.selectedType) {
+    showToast(copy("toastSelectType"));
+    return;
   }
 
-  document.getElementById("gameLog").innerHTML =
-    `Opened booster #${statsGame.boosters}: ${result}`
+  const count = clampNumber(elements.count.value, 1, 99999, 1);
+  const boxCount = clampNumber(elements.boxCount.value, 0, 99999, 0);
+  upsertEntry({ name, type: state.selectedType, count, boxCount, createdAt: Date.now() });
 
-  updateLuckMeter()
-  checkAchievements()
-  saveGame()
+  maybeUnlockAchievements();
+  saveState();
+  clearForm();
+  render();
+  showToast(copy("toastAdded"));
 }
- let unlocked = JSON.parse(localStorage.getItem("mtgAchievements")) || []
 
-function unlock(name){
-  if(!unlocked.includes(name)){
-    unlocked.push(name)
-    document.getElementById("achievements").innerHTML +=
-      `<div>🏆 ${name}</div>`
-    localStorage.setItem("mtgAchievements", JSON.stringify(unlocked))
+function removeEntry(id) {
+  if (!window.confirm(copy("removeConfirm"))) {
+    return;
   }
+  state.entries = state.entries.filter((entry) => entry.id !== id);
+  maybeUnlockAchievements();
+  saveState();
+  render();
+  showToast(copy("toastRemoved"));
 }
 
-function checkAchievements(){
-  if(statsGame.boosters >= 1) unlock("First Booster")
-  if(statsGame.boosters >= 10) unlock("Booster Addict")
-  if(statsGame.mythics >= 3) unlock("Mythic Hunter")
-  if(sets.length >= 5) unlock("Collector")
+function clearForm() {
+  elements.setName.value = "";
+  elements.count.value = "1";
+  elements.boxCount.value = "0";
 }
-function updateLuckMeter(){
-  let ratio = statsGame.mythics / statsGame.boosters
 
-  let text = "😐 Normal luck"
-
-  if(ratio > 0.2) text = "🔥 INSANE LUCK"
-  else if(ratio > 0.12) text = "😎 Lucky"
-  else if(ratio < 0.05) text = "💀 Cursed"
-
-  document.getElementById("luckMeter").innerText =
-    `Luck: ${text}`
+function clearAllData() {
+  if (!window.confirm(copy("clearConfirm"))) {
+    return;
+  }
+  state.entries = [];
+  state.game = normalizeGame({});
+  state.achievements = [];
+  saveState();
+  render();
+  showToast(copy("toastCleared"));
 }
- function mysteryEvent(){
-  let events = [
-    "💎 You pulled Black Lotus!!!",
-    "😭 All rares are trash",
-    "🔥 Double mythic booster!",
-    "✨ Everything is FOIL",
-    "📦 You found a hidden box"
-  ]
 
-  let e = events[Math.floor(Math.random()*events.length)]
-
-  document.getElementById("gameLog").innerHTML = e
+function exportCsv() {
+  const lines = [
+    ["Set", "Count", "Boxes", "Type", "Created At"].join(",")
+  ];
+  state.entries.forEach((entry) => {
+    lines.push([
+      escapeCsv(entry.name),
+      entry.count,
+      entry.boxCount,
+      entry.type,
+      new Date(entry.createdAt).toISOString()
+    ].join(","));
+  });
+  downloadFile(copy("csvName"), lines.join("\n"), "text/csv;charset=utf-8");
+  showToast(copy("toastExported"));
 }
- loadCloud()
+
+function exportJson() {
+  const payload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    entries: state.entries,
+    game: state.game,
+    achievements: state.achievements,
+    lang: state.lang
+  };
+  downloadFile(copy("jsonName"), JSON.stringify(payload, null, 2), "application/json");
+  showToast(copy("toastExported"));
+}
+
+function importJson() {
+  elements.importInput.value = "";
+  elements.importInput.click();
+}
+
+function handleImportFile(event) {
+  const [file] = event.target.files || [];
+  if (!file) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result || "{}"));
+      const result = importPayload(parsed);
+      maybeUnlockAchievements();
+      saveState();
+      render();
+      showToast(copy(result.legacy ? "toastLegacyImport" : "toastImported"));
+    } catch (error) {
+      showToast(copy("toastImportError"));
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importPayload(payload) {
+  let legacy = false;
+  if (Array.isArray(payload)) {
+    legacy = payload.some((item) => Array.isArray(item && item.types));
+    state.entries = normalizeLegacyOrCurrentEntries(payload);
+    return { legacy };
+  }
+
+  if (payload && typeof payload === "object") {
+    if (Array.isArray(payload.entries)) {
+      state.entries = normalizeLegacyOrCurrentEntries(payload.entries);
+      state.game = normalizeGame(payload.game || state.game);
+      state.achievements = normalizeAchievements(payload.achievements || state.achievements);
+      if (payload.lang === "cs" || payload.lang === "en") {
+        state.lang = payload.lang;
+      }
+      legacy = payload.version !== 2;
+      return { legacy };
+    }
+    if (Array.isArray(payload.data) || Array.isArray(payload.sets)) {
+      legacy = true;
+      state.entries = normalizeLegacyOrCurrentEntries(payload.data || payload.sets);
+      return { legacy };
+    }
+  }
+
+  throw new Error("Unsupported payload");
+}
+
+function normalizeLegacyOrCurrentEntries(entries) {
+  const output = [];
+  entries.forEach((item) => {
+    if (item && Array.isArray(item.types)) {
+      const name = String(item.name || "").trim();
+      const count = clampNumber(item.count, 1, 99999, 1);
+      const boxCount = clampNumber(item.boxCount, 0, 99999, 0);
+      item.types.forEach((type) => {
+        const nextType = sanitizeType(type);
+        if (!name || !nextType) {
+          return;
+        }
+        output.push({
+          id: createId(),
+          name,
+          count,
+          boxCount,
+          type: nextType,
+          keyrune: item.keyrune || SET_ICONS[name.toLowerCase()] || "",
+          createdAt: Date.now()
+        });
+      });
+      return;
+    }
+    const normalized = normalizeEntry(item);
+    if (normalized) {
+      output.push(normalized);
+    }
+  });
+  return output;
+}
+
+function openBooster() {
+  const count = clampNumber(elements.count.value, 1, 36, 1);
+  const setName = elements.setName.value.trim();
+  const type = state.selectedType || "PLAY";
+  let mythics = 0;
+  let rares = 0;
+  let foils = 0;
+  let specials = 0;
+  const pulls = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const result = rollBooster(type);
+    if (result.rarity === "MYTHIC") {
+      mythics += 1;
+      state.game.mythics += 1;
+    } else {
+      rares += 1;
+      state.game.rares += 1;
+    }
+    if (result.foil) {
+      foils += 1;
+      state.game.foils += 1;
+    }
+    if (result.special) {
+      specials += 1;
+    }
+    pulls.push({
+      setName,
+      type,
+      rarity: result.rarity,
+      foil: result.foil,
+      special: result.special,
+      at: Date.now() + index
+    });
+  }
+
+  state.game.boosters += count;
+  state.game.history = [...pulls.reverse(), ...state.game.history].slice(0, 10);
+  const trackerResult = setName
+    ? upsertEntry({ name: setName, type, count, boxCount: 0, createdAt: Date.now() })
+    : null;
+  state.game.lastLog = buildBoosterSummary({
+    setName,
+    type,
+    count,
+    mythics,
+    rares,
+    foils,
+    specials,
+    trackerResult
+  });
+  maybeUnlockAchievements();
+  saveState();
+  render();
+}
+
+function mysteryEvent() {
+  const events = [
+    copy("mysteryBlackLotus"),
+    copy("mysteryTrashRare"),
+    copy("mysteryDoubleMythic"),
+    copy("mysteryFoil"),
+    copy("mysteryHiddenBox")
+  ];
+  state.game.lastLog = events[Math.floor(Math.random() * events.length)];
+  saveState();
+  renderSimulator();
+}
+
+function maybeUnlockAchievements() {
+  const summary = getSummary();
+  ACHIEVEMENTS.forEach((achievement) => {
+    if (state.achievements.includes(achievement.id)) {
+      return;
+    }
+    if (achievement.test(summary, state.game)) {
+      state.achievements.push(achievement.id);
+      showToast(`${copy("toastAchievement")} ${achievement.labels[state.lang]}`);
+    }
+  });
+}
+
+function showToast(message) {
+  elements.toast.textContent = message;
+  elements.toast.classList.add("visible");
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    elements.toast.classList.remove("visible");
+  }, 2400);
+}
+
+function downloadFile(filename, contents, mimeType) {
+  const blob = new Blob([contents], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function formatDate(timestamp) {
+  if (!Number.isFinite(timestamp)) {
+    return copy("fallbackDate");
+  }
+  return new Intl.DateTimeFormat(state.lang === "en" ? "en-GB" : "cs-CZ", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  }).format(timestamp);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
+}
+
+function escapeCsv(value) {
+  return `"${String(value).replaceAll('"', '""')}"`;
+}
+
+function titleCase(value) {
+  return value.replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
+function setLanguage(lang) {
+  if (lang !== "cs" && lang !== "en") {
+    return;
+  }
+  state.lang = lang;
+  saveState();
+  render();
+}
+
+function pluralizeCs(count, one, few, many) {
+  if (count === 1) {
+    return one;
+  }
+  if (count >= 2 && count <= 4) {
+    return few;
+  }
+  return many;
+}
+
+elements.addButton.addEventListener("click", addEntry);
+elements.clearFormButton.addEventListener("click", clearForm);
+elements.exportCsvButton.addEventListener("click", exportCsv);
+elements.exportJsonButton.addEventListener("click", exportJson);
+elements.importJsonButton.addEventListener("click", importJson);
+elements.openBoosterButton.addEventListener("click", openBooster);
+elements.mysteryButton.addEventListener("click", mysteryEvent);
+elements.clearDataButton.addEventListener("click", clearAllData);
+elements.importInput.addEventListener("change", handleImportFile);
+elements.setName.addEventListener("input", renderSimulator);
+elements.count.addEventListener("input", renderSimulator);
+elements.searchInput.addEventListener("input", (event) => {
+  state.query = event.target.value;
+  renderEntries();
+});
+elements.sortSelect.addEventListener("change", (event) => {
+  state.sort = event.target.value;
+  renderEntries();
+});
+elements.setName.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    addEntry();
+  }
+});
+document.addEventListener("click", (event) => {
+  const typeButton = event.target.closest("[data-type]");
+  if (typeButton) {
+    state.selectedType = typeButton.dataset.type;
+    renderTypePicker();
+    renderSimulator();
+    return;
+  }
+  const langButton = event.target.closest("[data-lang-btn]");
+  if (langButton) {
+    setLanguage(langButton.dataset.langBtn);
+    return;
+  }
+  const removeButton = event.target.closest("[data-remove-id]");
+  if (removeButton) {
+    removeEntry(removeButton.dataset.removeId);
+  }
+});
+
+render();
 </script>
-
 </body>
 </html>

@@ -1024,12 +1024,12 @@ const ACHIEVEMENTS = [
   {
     id: "first-entry",
     test: (summary) => summary.entries.length >= 1,
-    labels: { cs: "PrvnĂ­ zĂˇpis", en: "First Entry" }
+    labels: { cs: "První zápis", en: "First Entry" }
   },
   {
     id: "five-sets",
     test: (summary) => summary.uniqueSetCount >= 5,
-    labels: { cs: "SbĂ­rka roste", en: "Growing Collection" }
+    labels: { cs: "Sbírka roste", en: "Growing Collection" }
   },
   {
     id: "box-hoarder",
@@ -1039,124 +1039,124 @@ const ACHIEVEMENTS = [
   {
     id: "first-booster",
     test: (_, game) => game.boosters >= 1,
-    labels: { cs: "PrvnĂ­ booster", en: "First Booster" }
+    labels: { cs: "První booster", en: "First Booster" }
   },
   {
     id: "mythic-hunter",
     test: (_, game) => game.mythics >= 3,
-    labels: { cs: "Lovec mythicĹŻ", en: "Mythic Hunter" }
+    labels: { cs: "Lovec mythiců", en: "Mythic Hunter" }
   },
   {
     id: "booster-addict",
     test: (_, game) => game.boosters >= 25,
-    labels: { cs: "Booster nadĹˇenec", en: "Booster Enthusiast" }
+    labels: { cs: "Booster nadšenec", en: "Booster Enthusiast" }
   }
 ];
 
 const COPY = {
   cs: {
     title: "MTG Booster Tracker",
-    eyebrow: "Centrum sbĂ­rky",
-    heroText: "PĹ™ehlednÄ›jĹˇĂ­ a stylovÄ›jĹˇĂ­ tracker pro otevĂ­rĂˇnĂ­ boosterĹŻ. PĹ™idĂˇvej edice, drĹľ statistiky pod kontrolou a mÄ›j vĹˇechno uloĹľenĂ© lokĂˇlnÄ› v prohlĂ­ĹľeÄŤi.",
-    heroKicker: "KaĹľdĂ˝ zĂˇpis se uklĂˇdĂˇ automaticky. MĹŻĹľeĹˇ si exportovat JSON nebo CSV a kdykoli se vrĂˇtit tam, kde jsi skonÄŤil.",
-    storageSaved: "Automaticky uloĹľeno do tohoto zaĹ™Ă­zenĂ­",
+    eyebrow: "Centrum sbírky",
+    heroText: "Přehlednější a stylovější tracker pro otevírání boosterů. Přidávej edice, drž statistiky pod kontrolou a měj všechno uložené lokálně v prohlížeči.",
+    heroKicker: "Každý zápis se ukládá automaticky. Můžeš si exportovat JSON nebo CSV a kdykoli se vrátit tam, kde jsi skončil.",
+    storageSaved: "Automaticky uloženo do tohoto zařízení",
     statTotalBoosters: "Boostery celkem",
-    statTrackedSets: "SledovanĂ© zĂˇznamy",
+    statTrackedSets: "Sledované záznamy",
     statBoxes: "Boxy",
-    statTopType: "NejÄŤastÄ›jĹˇĂ­ typ",
-    statLuck: "MĂ­ra ĹˇtÄ›stĂ­",
-    addEntryTitle: "PĹ™idat zĂˇznam",
-    addEntryText: "Jedna poloĹľka = jedna edice + jeden typ boosteru. Pokud stejnou kombinaci pĹ™idĂˇĹˇ znovu, poÄŤet se chytĹ™e navĂ˝ĹˇĂ­.",
-    fieldSetName: "NĂˇzev edice",
-    fieldCount: "PoÄŤet boosterĹŻ",
-    fieldBoxes: "PoÄŤet boxĹŻ",
-    fieldSetPlaceholder: "NapĹ™. Final Fantasy",
+    statTopType: "Nejčastější typ",
+    statLuck: "Míra štěstí",
+    addEntryTitle: "Přidat záznam",
+    addEntryText: "Jedna položka = jedna edice + jeden typ boosteru. Pokud stejnou kombinaci přidáš znovu, počet se chytře navýší.",
+    fieldSetName: "Název edice",
+    fieldCount: "Počet boosterů",
+    fieldBoxes: "Počet boxů",
+    fieldSetPlaceholder: "Např. Final Fantasy",
     typeTitle: "Typ boosteru",
-    typeText: "Vyber, do kterĂ© kategorie tento zĂˇznam patĹ™Ă­.",
-    addButton: "PĹ™idat do trackeru",
-    clearFormButton: "VyÄŤistit formulĂˇĹ™",
-    toolsTitle: "NĂˇstroje a hra",
-    toolsText: "Exporty pro poĹ™Ăˇdek, import pro nĂˇvrat a mini simulĂˇtor pro radost navĂ­c.",
+    typeText: "Vyber, do které kategorie tento záznam patří.",
+    addButton: "Přidat do trackeru",
+    clearFormButton: "Vyčistit formulář",
+    toolsTitle: "Nástroje a hra",
+    toolsText: "Exporty pro pořádek, import pro návrat a mini simulátor pro radost navíc.",
     exportsTitle: "Import / export",
-    exportsText: "CSV se hodĂ­ na tabulky, JSON na zĂˇlohu kompletnĂ­ho stavu.",
+    exportsText: "CSV se hodí na tabulky, JSON na zálohu kompletního stavu.",
     exportCsvButton: "Export CSV",
     exportJsonButton: "Export JSON",
     importJsonButton: "Import JSON",
-    simTitle: "Booster simulĂˇtor",
-    simText: "OtevĹ™i booster, sleduj mythic rate a sbĂ­rej achievementy.",
-    simHistoryTitle: "PoslednĂ­ pully",
-    openBoosterButton: "OtevĹ™Ă­t booster",
-    mysteryButton: "TajemnĂ˝ event",
-    clearDataButton: "Smazat vĹˇechna data",
+    simTitle: "Booster simulátor",
+    simText: "Otevři booster, sleduj mythic rate a sbírej achievementy.",
+    simHistoryTitle: "Poslední pully",
+    openBoosterButton: "Otevřít booster",
+    mysteryButton: "Tajemný event",
+    clearDataButton: "Smazat všechna data",
     collectionTitle: "Tvoje kolekce",
-    searchLabel: "VyhledĂˇvĂˇnĂ­",
+    searchLabel: "Vyhledávání",
     searchPlaceholder: "Hledat podle edice nebo typu",
-    sortLabel: "ĹazenĂ­",
-    sortNewest: "NejnovÄ›jĹˇĂ­",
-    sortOldest: "NejstarĹˇĂ­",
-    sortCountDesc: "NejvĂ­c boosterĹŻ",
-    sortAlphabetic: "AbecednÄ›",
+    sortLabel: "Řazení",
+    sortNewest: "Nejnovější",
+    sortOldest: "Nejstarší",
+    sortCountDesc: "Nejvíc boosterů",
+    sortAlphabetic: "Abecedně",
     headerSet: "Edice",
-    headerCount: "PoÄŤet",
+    headerCount: "Počet",
     headerBoxes: "Boxy",
     headerType: "Typ",
     headerActions: "Akce",
-    emptyState: "ZatĂ­m tu nic nenĂ­. PĹ™idej prvnĂ­ zĂˇznam a tracker oĹľije.",
-    analyticsTitle: "RozloĹľenĂ­ sbĂ­rky",
-    analyticsText: "Kolik boosterĹŻ padĂˇ do jednotlivĂ˝ch kategoriĂ­ a co teÄŹ sbĂ­rku tĂˇhne nejvĂ­c.",
-    chartEmpty: "Jakmile pĹ™idĂˇĹˇ prvnĂ­ zĂˇznam, objevĂ­ se tu rozdÄ›lenĂ­ podle typĹŻ.",
-    removeEntry: "Smazat poloĹľku",
-    removeConfirm: "Opravdu chceĹˇ smazat tento zĂˇznam?",
-    clearConfirm: "Opravdu chceĹˇ smazat vĹˇechna uloĹľenĂˇ data?",
-    toastAdded: "ZĂˇznam pĹ™idĂˇn do trackeru.",
-    toastRemoved: "ZĂˇznam smazĂˇn.",
-    toastCleared: "VĹˇechna data byla smazĂˇna.",
-    toastImported: "Import probÄ›hl v poĹ™Ăˇdku.",
-    toastExported: "Soubor je pĹ™ipraven ke staĹľenĂ­.",
-    toastAchievement: "NovĂ˝ achievement odemÄŤen.",
-    toastSelectType: "NejdĹ™Ă­v vyber typ boosteru.",
-    toastSetName: "DoplĹ prosĂ­m nĂˇzev edice.",
-    toastImportError: "Import se nepodaĹ™il. Zkus jinĂ˝ soubor JSON.",
-    toastLegacyImport: "NaÄŤetl jsem i starĹˇĂ­ formĂˇt dat.",
-    summary: "{entries} zĂˇznamĹŻ, {unique} unikĂˇtnĂ­ch edic, {boosters} boosterĹŻ celkem.",
-    typeShare: "{count} boosterĹŻ â€˘ {share}%",
-    topTypeMeta: "{count} boosterĹŻ v tĂ©to kategorii",
-    totalBoostersMeta: "Ve vĹˇech zĂˇznamech dohromady",
-    trackedSetsMeta: "{unique} unikĂˇtnĂ­ch nĂˇzvĹŻ edic",
-    boxesMeta: "CelkovĂ˝ poÄŤet zapsanĂ˝ch boxĹŻ",
-    luckHot: "Ĺ˝havĂ© tahy",
-    luckGood: "SolidnĂ­ run",
-    luckNormal: "NormĂˇlnĂ­ ĹˇtÄ›stĂ­",
-    luckCold: "Trochu smĹŻla",
-    luckMeta: "{mythics} mythicĹŻ z {boosters} otevĹ™enĂ˝ch boosterĹŻ",
-    noLuckMeta: "Booster simulĂˇtor jeĹˇtÄ› nemĂˇ data",
-    simIntro: "SimulĂˇtor ÄŤekĂˇ na prvnĂ­ booster. Mythic rate poÄŤĂ­tĂˇm jen z otevĹ™enĂ˝ch boosterĹŻ tady na strĂˇnce.",
-    simContextReadyLead: "AktivnĂ­ otevĹ™enĂ­ pouĹľije",
-    simContextReadyTail: "Po otevĹ™enĂ­ se boostery automaticky pĹ™ipĂ­Ĺˇou do trackeru a novĂˇ edice se zaloĹľĂ­ sama.",
-    simContextMissing: "VyplĹ nahoĹ™e nĂˇzev edice a vyber typ. Pak bude otevĹ™enĂ­ rovnou zapisovat i novĂ© edice do trackeru.",
-    simHistoryEmpty: "ZatĂ­m ĹľĂˇdnĂˇ historie otevĹ™enĂ­.",
-    simSummary: "{opened} pro {set} ({type}) â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
-    simSummaryNoSet: "{opened} v typu {type} â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
-    simAutoCreated: "NovĂˇ edice byla zaloĹľena automaticky.",
-    simAutoUpdated: "Edice v trackeru byla automaticky navĂ˝Ĺˇena.",
-    simAutoSkipped: "Bez nĂˇzvu edice tohle otevĹ™enĂ­ zĹŻstalo jen v simulĂˇtoru.",
+    emptyState: "Zatím tu nic není. Přidej první záznam a tracker ožije.",
+    analyticsTitle: "Rozložení sbírky",
+    analyticsText: "Kolik boosterů padá do jednotlivých kategorií a co teď sbírku táhne nejvíc.",
+    chartEmpty: "Jakmile přidáš první záznam, objeví se tu rozdělení podle typů.",
+    removeEntry: "Smazat položku",
+    removeConfirm: "Opravdu chceš smazat tento záznam?",
+    clearConfirm: "Opravdu chceš smazat všechna uložená data?",
+    toastAdded: "Záznam přidán do trackeru.",
+    toastRemoved: "Záznam smazán.",
+    toastCleared: "Všechna data byla smazána.",
+    toastImported: "Import proběhl v pořádku.",
+    toastExported: "Soubor je připraven ke stažení.",
+    toastAchievement: "Nový achievement odemčen.",
+    toastSelectType: "Nejdřív vyber typ boosteru.",
+    toastSetName: "Doplň prosím název edice.",
+    toastImportError: "Import se nepodařil. Zkus jiný soubor JSON.",
+    toastLegacyImport: "Načetl jsem i starší formát dat.",
+    summary: "{entries} záznamů, {unique} unikátních edic, {boosters} boosterů celkem.",
+    typeShare: "{count} boosterů • {share}%",
+    topTypeMeta: "{count} boosterů v této kategorii",
+    totalBoostersMeta: "Ve všech záznamech dohromady",
+    trackedSetsMeta: "{unique} unikátních názvů edic",
+    boxesMeta: "Celkový počet zapsaných boxů",
+    luckHot: "Žhavé tahy",
+    luckGood: "Solidní run",
+    luckNormal: "Normální štěstí",
+    luckCold: "Trochu smůla",
+    luckMeta: "{mythics} mythiců z {boosters} otevřených boosterů",
+    noLuckMeta: "Booster simulátor ještě nemá data",
+    simIntro: "Simulátor čeká na první booster. Mythic rate počítám jen z otevřených boosterů tady na stránce.",
+    simContextReadyLead: "Aktivní otevření použije",
+    simContextReadyTail: "Po otevření se boostery automaticky připíšou do trackeru a nová edice se založí sama.",
+    simContextMissing: "Vyplň nahoře název edice a vyber typ. Pak bude otevření rovnou zapisovat i nové edice do trackeru.",
+    simHistoryEmpty: "Zatím žádná historie otevření.",
+    simSummary: "{opened} pro {set} ({type}) • {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simSummaryNoSet: "{opened} v typu {type} • {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simAutoCreated: "Nová edice byla založena automaticky.",
+    simAutoUpdated: "Edice v trackeru byla automaticky navýšena.",
+    simAutoSkipped: "Bez názvu edice tohle otevření zůstalo jen v simulátoru.",
     simFoilLabel: "foil",
     simSpecialLabel: "special",
-    simUnknownSet: "NeznĂˇmĂˇ edice",
+    simUnknownSet: "Neznámá edice",
     simOpened: "Booster #{boosters}: {rarity}{foil}",
     simFoilSuffix: " + FOIL",
     rarityMythic: "MYTHIC",
     rarityRare: "Rare",
     mysteryBlackLotus: "Narazil jsi na vibe Black Lotus dne.",
-    mysteryTrashRare: "Dneska to spĂ­Ĺˇ chutnĂˇ po bulk rare.",
-    mysteryDoubleMythic: "V hlavÄ› sis otevĹ™el double mythic booster.",
-    mysteryFoil: "VĹˇechno kolem tebe se na chvĂ­li tvĂˇĹ™Ă­ foilovÄ›.",
-    mysteryHiddenBox: "NÄ›kde v polici se urÄŤitÄ› schovĂˇvĂˇ dalĹˇĂ­ box.",
-    countShort: "PoÄŤet",
+    mysteryTrashRare: "Dneska to spíš chutná po bulk rare.",
+    mysteryDoubleMythic: "V hlavě sis otevřel double mythic booster.",
+    mysteryFoil: "Všechno kolem tebe se na chvíli tváří foilově.",
+    mysteryHiddenBox: "Někde v polici se určitě schovává další box.",
+    countShort: "Počet",
     boxesShort: "Boxy",
     typeShort: "Typ",
-    addedOn: "PĹ™idĂˇno",
-    noTopType: "ZatĂ­m ĹľĂˇdnĂ˝",
+    addedOn: "Přidáno",
+    noTopType: "Zatím žádný",
     fallbackDate: "Dnes",
     csvName: "mtg_booster_tracker.csv",
     jsonName: "mtg_booster_tracker.json"
@@ -1226,7 +1226,7 @@ const COPY = {
     toastImportError: "Import failed. Try another JSON file.",
     toastLegacyImport: "Legacy data format was imported too.",
     summary: "{entries} entries, {unique} unique sets, {boosters} boosters total.",
-    typeShare: "{count} boosters â€˘ {share}%",
+    typeShare: "{count} boosters • {share}%",
     topTypeMeta: "{count} boosters in this category",
     totalBoostersMeta: "Across all tracker entries",
     trackedSetsMeta: "{unique} unique set names",
@@ -1242,8 +1242,8 @@ const COPY = {
     simContextReadyTail: "Opened boosters will be added to the tracker automatically, and brand-new sets will be created for you.",
     simContextMissing: "Enter a set name above and keep a booster type selected. Then every opening can create or update the set automatically.",
     simHistoryEmpty: "No opening history yet.",
-    simSummary: "{opened} for {set} ({type}) â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
-    simSummaryNoSet: "{opened} in {type} â€˘ {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simSummary: "{opened} for {set} ({type}) • {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
+    simSummaryNoSet: "{opened} in {type} • {mythics} mythic, {rares} rare, {foils} foil, {specials} special hit.",
     simAutoCreated: "A new set entry was created automatically.",
     simAutoUpdated: "The existing tracker entry was increased automatically.",
     simAutoSkipped: "Without a set name, this opening stayed in the simulator only.",
@@ -1551,7 +1551,7 @@ function getSummary() {
 function renderSummary() {
   const summary = getSummary();
   elements.collectionSummary.textContent = state.lang === "cs"
-    ? `${summary.entries.length} ${pluralizeCs(summary.entries.length, "zĂˇznam", "zĂˇznamy", "zĂˇznamĹŻ")}, ${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikĂˇtnĂ­ edice", "unikĂˇtnĂ­ edice", "unikĂˇtnĂ­ch edic")}, ${summary.totalBoosters} ${pluralizeCs(summary.totalBoosters, "booster", "boostery", "boosterĹŻ")} celkem.`
+    ? `${summary.entries.length} ${pluralizeCs(summary.entries.length, "záznam", "záznamy", "záznamů")}, ${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikátní edice", "unikátní edice", "unikátních edic")}, ${summary.totalBoosters} ${pluralizeCs(summary.totalBoosters, "booster", "boostery", "boosterů")} celkem.`
     : copy("summary", {
         entries: String(summary.entries.length),
         unique: String(summary.uniqueSetCount),
@@ -1629,7 +1629,7 @@ function renderEntryRow(entry) {
         </span>
       </div>
       <div class="entry-actions">
-        <button type="button" data-remove-id="${escapeAttribute(entry.id)}" aria-label="${escapeAttribute(copy("removeEntry"))}">Ă—</button>
+        <button type="button" data-remove-id="${escapeAttribute(entry.id)}" aria-label="${escapeAttribute(copy("removeEntry"))}">×</button>
       </div>
       ${mobileMeta}
     </article>
@@ -1643,14 +1643,14 @@ function renderStats() {
   elements.statTotalBoostersMeta.textContent = copy("totalBoostersMeta");
   elements.statTrackedSetsValue.textContent = String(summary.entries.length);
   elements.statTrackedSetsMeta.textContent = state.lang === "cs"
-    ? `${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikĂˇtnĂ­ nĂˇzev edice", "unikĂˇtnĂ­ nĂˇzvy edic", "unikĂˇtnĂ­ch nĂˇzvĹŻ edic")}`
+    ? `${summary.uniqueSetCount} ${pluralizeCs(summary.uniqueSetCount, "unikátní název edice", "unikátní názvy edic", "unikátních názvů edic")}`
     : copy("trackedSetsMeta", { unique: String(summary.uniqueSetCount) });
   elements.statBoxesValue.textContent = String(summary.totalBoxes);
   elements.statBoxesMeta.textContent = copy("boxesMeta");
   elements.statTopTypeValue.textContent = topType;
   elements.statTopTypeMeta.textContent = summary.topType
     ? (state.lang === "cs"
-        ? `${summary.topTypeCount} ${pluralizeCs(summary.topTypeCount, "booster", "boostery", "boosterĹŻ")} v tĂ©to kategorii`
+        ? `${summary.topTypeCount} ${pluralizeCs(summary.topTypeCount, "booster", "boostery", "boosterů")} v této kategorii`
         : copy("topTypeMeta", { count: String(summary.topTypeCount) }))
     : copy("chartEmpty");
 
@@ -1679,7 +1679,7 @@ function renderSimulator() {
   const currentCount = clampNumber(elements.count.value, 1, 36, 1);
   const currentTypeLabel = TYPE_META[state.selectedType].labels[state.lang];
   elements.simContext.innerHTML = currentSet
-    ? `${escapeHtml(copy("simContextReadyLead"))} <strong>${escapeHtml(currentSet)}</strong> â€˘ ${escapeHtml(currentTypeLabel)} â€˘ x${currentCount}. ${escapeHtml(copy("simContextReadyTail"))}`
+    ? `${escapeHtml(copy("simContextReadyLead"))} <strong>${escapeHtml(currentSet)}</strong> • ${escapeHtml(currentTypeLabel)} • x${currentCount}. ${escapeHtml(copy("simContextReadyTail"))}`
     : escapeHtml(copy("simContextMissing"));
   elements.simOutput.textContent = state.game.lastLog || copy("simIntro");
   if (!state.game.history.length) {
@@ -1700,7 +1700,7 @@ function renderPullHistoryItem(pull) {
   return `
     <div class="sim-history-item">
       <strong>${escapeHtml(pull.setName || copy("simUnknownSet"))}</strong>
-      <span class="sim-history-meta">${escapeHtml(TYPE_META[pull.type].labels[state.lang])} â€˘ ${escapeHtml(tags.join(" â€˘ "))}</span>
+      <span class="sim-history-meta">${escapeHtml(TYPE_META[pull.type].labels[state.lang])} • ${escapeHtml(tags.join(" • "))}</span>
     </div>
   `;
 }
@@ -1711,7 +1711,7 @@ function renderAchievements() {
     if (!achievement) {
       return "";
     }
-    return `<span class="achievement-pill">âś¦ ${escapeHtml(achievement.labels[state.lang])}</span>`;
+    return `<span class="achievement-pill">✦ ${escapeHtml(achievement.labels[state.lang])}</span>`;
   }).join("");
 }
 
